@@ -1,0 +1,248 @@
+﻿
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <tiTle> moran project</tiTle>
+</head>
+<body>
+    <nav class="navbar navbar-right navbar-fixed-top navbar-inverse">
+        <div class="container-fluid" style="direction:rtl;float:right;">
+            <div class="navbar-header" style="float:right;">
+                <a class="navbar-brand" href="UserHomePage.aspx">WebSiteName</a>
+            </div>
+            <ul class="nav navbar-nav" style="float:right;"></ul>
+        </div>
+        <div class="container-fluid" style="float:left;">
+            <ul class="nav navbar" ">
+                <li><a href="../LogIn.aspx">יציאה</a></li>
+            </ul>
+        </div>
+    </nav>
+    <fOrm Id=form1 runaT=server>
+        <diV>
+
+        </diV>
+    </fOrm>
+
+    <!-- Visual Studio Browser Link -->
+    <script type="application/json" id="__browserLink_initializationData">
+        {"appName":"Chrome","requestId":"1d5881f629fd4c739d1f41e17cf6f6f6"}
+    </script>
+    <script type="text/javascript" src="http://localhost:50126/834add76f3924800acba7d2f5607d690/browserLink" async="async"></script>
+    <!-- End Browser Link -->
+
+</body>
+</html>
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>
+
+    </title>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+    <script type="text/javascript">
+        function GetUrl(index)
+        {
+            var remarkUser = document.getElementsByName("RemarkUser").value;
+            var daysOff = document.getElementsByName("DaysOff").value;
+            var daysSick = document.getElementsByName("DaysSick").value;
+            MyDict = { RemarkUser: remarkUser, DaysOff: daysOff, DaysSick: daysSick };
+            for (var i = 0; i < index; i++)
+            {
+
+            }
+            $.ajax({
+                data: MyDict,
+                type: 'get',
+                url: 'UserHomePage.aspx',
+                async: true,
+                dataType: 'text',
+                error: function (output) {
+                    console.log('error');
+                }
+            });
+        }
+
+        String.format = function () {
+            // The string containing the format items (e.g. "{0}")
+            // will and always has to be the first argument.
+            var theString = arguments[0];
+
+            // start with the second argument (i = 1)
+            for (var i = 1; i < arguments.length; i++) {
+                // "gm" = RegEx options for Global search (more than one instance)
+                // and for Multiline search
+                var regEx = new RegExp("\\{" + (i - 1) + "\\}", "gm");
+                theString = theString.replace(regEx, arguments[i]);
+            }
+
+            return theString;
+        }
+    </script>
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
+    <script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js'>
+    </script>
+    <script type='text/javascript' src='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js'></script>
+    <style type="text/css">
+        .table td {
+            text-align: center;
+        }
+
+        .table th {
+            text-align: center;
+        }
+    </style>
+</head>
+<body onload="SetButton()">
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <div class="container">
+        <div class="col-md-offset-0">
+            <div class="col-md-18">
+                <div class="panel panel-info">
+                    <div class="panel-heading" dir="rtl">
+                        דיווח ביצועים
+                    </div>
+                    <div class="panel-body" dir="rtl">
+                        <form class="form-inline" action="user/UserHomePage.aspx" method="post">
+                            <table class="table" dir="rtl">
+                                <tbody>
+
+                                    <tr>
+                                        <td>שם עובד</td>
+                                        <td><input type="text" name="WorkerName" id="WorkerName" value="חנה לוי" /></td>
+                                        <td>שם תפקיד</td>
+                                        <td><input type="text" name="WorkerName" id="JobName" value="עובד סוציאלי" /></td>
+                                        <td>סוג תפקיד</td>
+                                        <td><input type="text" name="WorkerName" id="JobType" value="1" /></td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>חודש</td>
+                                        <td>
+
+                                            <select name="month" id="month">
+                                                <option value='1'>1</option>
+                                                <option value='2'>2</option>
+                                                <option value='3'>3</option>
+                                                <option value='4'>4</option>
+                                                <option value='5'>5</option>
+                                                <option value='6'>6</option>
+                                                <option value='7'>7</option>
+                                                <option value='8'>8</option>
+                                                <option value='9'>9</option>
+                                                <option value='10'>10</option>
+                                                <option value='11'>11</option>
+                                                <option value='12'>12</option>
+                                            </select>
+                                        </td>
+                                        <td>שנה</td>
+                                        <td>
+                                            <select name="year" id="year">
+                                                <option value='2016'>2016</option>
+                                                <option value='2015'>2015</option>
+                                                <option value='2014'>2014</option>
+                                                <option value='2013'>2013</option>
+                                                <option value='2012'>2012</option>
+                                                <option value='2011'>2011</option>
+                                                <option value='2010'>2010</option>
+                                                <option value='2009'>2009</option>
+                                                <option value='2008'>2008</option>
+                                                <option value='2007'>2007</option>
+                                                <option value='2006'>2006</option>
+                                                <option value='2005'>2005</option>
+                                                <option value='2004'>2004</option>
+                                                <option value='2003'>2003</option>
+                                                <option value='2002'>2002</option>
+                                            </select>
+                                        </td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+                            <input type="submit" value="חפש" style="width:100px;" />
+                        </form>
+                        <br />
+                        <br />
+                        <form action="user/SpecifyPerforms.aspx" method='post'>
+                            <table class='table' dir='rtl'>
+                                <tr>
+                                    <td>הערת מנהל:</td>
+                                    <td>אין</td>
+                                    <td>הערת משתמש:</td>
+                                    <td>
+                                        <input type='text' name="RemarkUser" id="RemarkUser" value='כלום' />
+                                    </td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td><br /><br /></td>
+                                </tr>
+                                <tr><td></td><td></td><td></td><td></td><th>ימי היעדרות</th><td></td><td></td><td></td><td><br /><br /></td></tr>
+                                <tr>
+                                    <td>ימי חופשה מצטברים:</td>
+                                    <td>1</td>
+                                    <td>ימי מחלה מצטברים:</td>
+                                    <td>1</td>
+                                    <td>ימי חופשה:</td>
+                                    <td><input type='text' name='DaysOff' value='3' /></td>
+                                    <td>ימי מחלה:</td>
+                                    <td><input type='text' name='DaysSick' value='1' /></td>
+                                </tr>
+                            </table>
+                            <br />
+                            <br />
+                            <table class="table" dir="rtl">
+                                <thead>
+                                    <tr>
+                                        <th> תאריך: </th>
+                                        <th>4/26/2016 12:00:00 AM</th>
+                                        <th> סטטוס דיווח: </th>
+                                        <th>2</th>
+                                        <th> אחוז ביצוע שנתי: </th>
+                                        <th>3</th>
+                                        <th> אחוז ביצוע לעומת תכנון: </th>
+                                        <th>36</th>
+                                    </tr>
+                                </thead>
+                            </table>
+
+
+
+
+                            <table class='table'>
+                                <thead>
+                                    <tr>
+                                        <th>תיאור</th>
+                                        <th>משקולות</th>
+                                        <th>תכנון חודשי</th>
+                                        <th>ביצוע חודשי</th>
+                                        <th>אחוז ביצוע/תכנון</th>
+                                        <th>תכנון מצטבר</th>
+                                        <th>ביצוע מצטבר</th>
+                                        <th>אחוז ביצוע/תכנון</th>
+                                        <th>הערה</th>
+                                        <th>פירוט</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    <tr><td>ביקורי בית</td><td>20</td><td>10</td><td><input type='text' name='DoneMonth0' value='11' /></td><td>110</td><td>10</td><td>11</td><td>110</td><td><input type='text' name='Remark0' value='אין' /></td><td><a href=SpecifyPerforms.aspx?Indx =1><button>פירוט</button></a></td></tr>
+                                    <tr><td>ארגון מסיבות</td><td>20</td><td>10</td><td><input type='text' name='DoneMonth1' value='0' /></td><td>0</td><td>10</td><td>0</td><td>0</td><td><input type='text' name='Remark1' value=' '/></td><td><a href=SpecifyPerforms.aspx?Indx=2><button>פירוט</button></a></td></tr><tr><td>ארגון כנסים</td><td>20</td><td>10</td><td><input type='text' name='DoneMonth2' value='0' /></td><td>0</td><td>10</td><td>0</td><td>0</td><td><input type='text' name='Remark2' value=' '/></td><td><a href=SpecifyPerforms.aspx?Indx=3><button>פירוט</button></a></td></tr><input type=hidden name='Length' id='Length' value='3' />
+                                </tbody>
+                            </table> <br /> <br /> <input type='submit' value='שמור' style='float:left;' />
+                        </form>
+
+                    </div>
