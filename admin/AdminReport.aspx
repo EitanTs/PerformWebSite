@@ -36,6 +36,7 @@
             return select.selectedIndex;
         }
         function SelectValues() {
+            //document.getElementById("search").disabled = true;
             document.getElementById("unit").selectedIndex = QueryString["unitId"];
             document.getElementById("SubUnit").selectedIndex = QueryString["subId"];
             document.getElementById("team").selectedIndex = QueryString["teamId"];
@@ -59,6 +60,16 @@
                     + "&teamId=" + QueryString["teamId"] + "&teamV=" + teamValue;
             if(flag)
                 window.location = url;
+        }
+        function IsNumber() {
+            if (document.getElementById("plan").value > -1) {
+                document.getElementById("search").disabled = false;
+                document.getElementById("search").className = "button";
+            }
+            else {
+                alert("Please enter a number");
+                document.getElementById("search").className = "btn-disable";
+            }
         }
         var QueryString = function () {
             // This function is anonymous, is executed immediately and 
@@ -84,6 +95,24 @@
         } ();
     
     </script>
+        <style type="text/css">
+    .btn-disable
+        {
+        cursor: default;
+        pointer-events: none;
+
+        /*Button disabled - CSS color class*/
+        color: #c0c0c0;
+        background-color: #ffffff;
+
+        }
+</style>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+    <link rel='stylesheet' href='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'/>
+  <script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js'>
+  </script>
+  <script type='text/javascript' src='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js'></script>
+  
 </head>
 <body onload="SelectValues()">
     <br />
@@ -147,7 +176,9 @@
                             <td></td>
                         </tr>
                         <tr><td><br /></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td>תכנון/ ביצוע קטן מ-</td><td></td><td><input type="submit" value="חפש" /></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td>תכנון/ ביצוע קטן מ-</td><td><input type="text" name="plan" id="plan" onchange="IsNumber()"/></td>
+                        <td><input type="submit" id="search" value="חפש" disabled='disabled' class='btn-disable'/>
+                        </td><td></td><td></td><td></td><td></td><td></td></tr>
                         </tbody>
                     </table>
                <br />
