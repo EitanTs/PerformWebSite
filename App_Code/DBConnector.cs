@@ -22,7 +22,14 @@ public class DBConnector : System.Web.UI.Page
 
     public DataTable ExecuteQuery(string query, DBParameterCollection dbp)
     {
-        return dbHelper.ExecuteDataTable(query, dbp, CommandType.Text);
+        try
+        {
+            return dbHelper.ExecuteDataTable(query, dbp, CommandType.Text);
+        }
+        catch(Exception e)
+        {
+            throw e;
+        }
     }
 
     public DataTable ExecuteProcedure(string query)

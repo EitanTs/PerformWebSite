@@ -18,16 +18,20 @@ public class AdminQueries
 
     public static string GetUnit = @"SELECT * FROM [Perform-Project].[dbo].[MB_Units]
                                     WHERE  Status = 1
-                                    AND DepIndx =  1
-                                    AND UnitIndx = 1";
-
+                                    AND DepIndx =  @DepIndx
+                                    AND UnitIndx = ISNULL(@UnitIndx,UnitIndx)";
+    
     public static string GetSubUnit = @"SELECT SubUnitIndx,SubUnitName
 	                                    From MB_SubUnits
 	                                    WHERE  Status =1
 	                                    AND UnitIndx =  @UnitIndx
 	                                    AND SubUnitIndx = ISNULL(@SubUnitIndx,SubUnitIndx)";
 
-
+    public static string GetTeam = @"SELECT CodeTeam
+	                                From MB_UserJob
+	                                WHERE  Status =1
+	                                AND SubUnitIndx= @SubUnitIndx 
+	                                AND CodeTeam = ISNULL(@CodeTeam,CodeTeam)";
 
     public static string GetMainTable = @"SELECT U.FullName,J.JobName,G.PrfGrpIndx,G.UseMonth G_UseYear,G.PersentPlnYear,G.PersentIncremental,
 	G.ReportStatus,G.RemarkManager,G.RemarkUser,G.DaysOffWork,G.SickDays

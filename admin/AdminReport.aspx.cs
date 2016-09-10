@@ -14,7 +14,8 @@ public partial class admin_AdminReport : System.Web.UI.Page
     PrintHtml printHtml = new PrintHtml();
     DBConnector dbConn = new DBConnector();
     Table table = new Table();
-    DBParameterCollection dbp = new DBParameterCollection();
+    string url = "AdminReport.aspx?unit={0}&unitV={1}";
+    string OptionString = "<option value='{0}'>{1}</option>";
 
     public void PrintToolBar()
     {
@@ -22,22 +23,52 @@ public partial class admin_AdminReport : System.Web.UI.Page
     }
     public void PrintDepName()
     {
+        DBParameterCollection dbp = new DBParameterCollection();
         dbp.Add(new DBParameter("@DepIndx", Session["DepIndx"].ToString()));
         Response.Write(dbConn.ExecuteQuery(AdminQueries.GetDep, dbp).Rows[0]["DepName"]);
     }
     public void PrintUnitType()
     {
         var dt = dbConn.ExecuteQuery(AdminQueries.GetUnitType);
-        foreach (DataRow dr in dt.Rows)
-        {
-            Response.Write(string.Format("<option value='{0}'>{1}</option>", 
-                dr["SupportDTLIndx"].ToString(), dr["SupportDTLName"].ToString()));
-        }
+        PrintOptionValues(dt, "SupportDTLIndx", "SupportDTLName");
     }
     public void PrintUnit()
+    {
+        DBParameterCollection dbp = new DBParameterCollection();
+        if (int.Parse(Session["JobHierarchy"].ToString()) > 4)
+            dbp.Add(new DBParameter("@UnitIndx", DBNull.Value));
+        else
+            dbp.Add(new DBParameter("@UnitIndx", Session["UnitIndx"]));
+        dbp.Add(new DBParameter("@DepIndx", Session["DepIndx"].ToString()));
+        var dt = dbConn.ExecuteQuery(AdminQueries.GetUnit, dbp);
+        if (Request.QueryString["unitV"] == null)
+        {
+            Response.Redirect(string.Format(url, Request.QueryString["unitId"], dt.Rows[0]["UnitIndx"]));
+        }
+        PrintOptionValues(dt, "UnitIndx", "UnitName");
+        
+    }
+    public void PrintSubUnit()
+    {
+        DBParameterCollection dbp = new DBParameterCollection();
+        if (int.Parse(Session["JobHierarchy"].ToString()) > 30)
+            dbp.Add(new DBParameter("@SubUnitIndx", DBNull.Value));
+        else
+            dbp.Add(new DBParameter("@SubUnitIndx", Session["SubUnitIndx"]));
+        dbp.Add(new DBParameter("@UnitIndx", Request.QueryString["unitV"]));
+        var dt = dbConn.ExecuteQuery(AdminQueries.GetSubUnit, dbp);
+        PrintOptionValues(dt,"SubUnitIndx","SubUnitName");
+    }
+    public void PrintTeam()
     { 
-        dbp.Add(new DBParameter("@UnitIndx", Session["UnitIndx"]));
-        Response.Write(dbConn.ExecuteQuery(AdminQueries.GetUnit, dbp).Rows[0]["UnitName"]);
+        
+    }
+    public void PrintOptionValues(DataTable dt, string firstCol, string secondCol)
+    {
+        foreach (DataRow dr in dt.Rows)
+        {
+            Response.Write(string.Format(OptionString, dr[firstCol].ToString(), dr[secondCol].ToString()));
+        }
     }
     protected void Page_Load(object sender, EventArgs e)
     {

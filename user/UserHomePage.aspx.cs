@@ -21,6 +21,7 @@ public partial class UserHomePage : System.Web.UI.Page
     PrintHtml printHtml = new PrintHtml();
     Table table = new Table();
     DBConnector dbConn = new DBConnector();
+    
     string htmlTable = "";
    
     public void PrintToolBar()
@@ -50,6 +51,8 @@ public partial class UserHomePage : System.Web.UI.Page
 
     public void PrintMainTable()
     {
+        var updateUser = "";
+        var updateDate = "";
             htmlTable += @"    
             <table class='table'>
                 <thead>
@@ -72,7 +75,12 @@ public partial class UserHomePage : System.Web.UI.Page
         cols[8] = "PresentIncremental";
         cols[9] = "Remark";
         var dt = dbConn.ExecuteQuery(Queries.HomePageMainTable, dbp);
-        ParseDtToXL(dt, ConfigurationManager.AppSettings["Path"],cols);
+        if (dt.Rows.Count > 0)
+        {
+            updateUser = dt.Rows[0]["Update_User"].ToString();
+            updateDate = DateTime.Parse(dt.Rows[0]["update_date"].ToString()).ToString("MM/dd/yyyy");
+        }
+            ParseDtToXL(dt, ConfigurationManager.AppSettings["Path"],cols);
         var dict = table.GetColors();
         //htmlTable += "<tbody>";
         var i = 0;
@@ -133,10 +141,10 @@ public partial class UserHomePage : System.Web.UI.Page
             <td>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</td>
             <td><input type='submit' value='סיים דיווח' style='float:left;' name='EndReport' {0}/></td>
             <td>&nbsp &nbsp <button><a href='/excel/MainTable.csv' download>הפק דוח אקסל</a></button></td>
-            <td>&nbsp &nbsp <button onclick='OpenAlert(""test"")'>הצג משתמש מעדכן</button></td>
+            <td>&nbsp &nbsp <button onclick='OpenAlert(""Update User: {1} \r\n Update Date: {2}"")'>הצג משתמש מעדכן</button></td>
             </tr>
             </table>
-            </form>", disabled);
+            </form>", disabled, updateUser, updateDate);
     
         Response.Write(htmlTable);
     }
