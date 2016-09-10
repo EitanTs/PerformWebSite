@@ -27,11 +27,34 @@ public class AdminQueries
 	                                    AND UnitIndx =  @UnitIndx
 	                                    AND SubUnitIndx = ISNULL(@SubUnitIndx,SubUnitIndx)";
 
-    public static string GetTeam = @"SELECT CodeTeam
+    public static string GetTeam = @"SELECT distinct CodeTeam
 	                                From MB_UserJob
 	                                WHERE  Status =1
 	                                AND SubUnitIndx= @SubUnitIndx 
 	                                AND CodeTeam = ISNULL(@CodeTeam,CodeTeam)";
+   
+   public static string GetReportStatus = @"SELECT *
+  FROM [Perform-Project].[dbo].[MB_SupportDetails]
+  WHERE SupportIndx = 9";
+
+   public static string GetHirarchy = @"SELECT SupportDTLName,SupportDTLIndx,SupportDTLNum
+	From [Perform-Project].[dbo].[MB_SupportDetails]
+	WHERE  Status =1
+	AND SupportIndx= 4
+    AND SupportDTLNum < @Hierarchy";
+
+   public static string GetWorkers = @"SELECT distinct U.UserIndx,FullName
+	From       MB_Users   U
+	INNER JOIN MB_UserJob UJ
+	      ON  U.UserIndx= UJ.UserIndx
+	WHERE  U.Status =1
+	AND UJ.Status =1
+	AND UJ.CompanyIndx =    @CompanyIndx
+	AND UJ.DepIndx =ISNULL(@DepIndx,UJ.DepIndx)
+	AND UJ.UnitIndx =ISNULL(@UnitIndx,UJ.UnitIndx)
+	AND UJ.SubUnitIndx =ISNULL(@SubUnitIndx,UJ.SubUnitIndx)
+	AND UJ.CodeTeam =ISNULL(@CodeTeam,UJ.CodeTeam)
+	AND U.UserIndx =ISNULL(@UserIndx,U.UserIndx)";
 
     public static string GetMainTable = @"SELECT U.FullName,J.JobName,G.PrfGrpIndx,G.UseMonth G_UseYear,G.PersentPlnYear,G.PersentIncremental,
 	G.ReportStatus,G.RemarkManager,G.RemarkUser,G.DaysOffWork,G.SickDays

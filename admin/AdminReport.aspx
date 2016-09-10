@@ -7,15 +7,58 @@
     <title></title>
     <script type="text/javascript">
 
-
-        function GetSelectedValues() {
-            var unitSelect = document.getElementById("unit");
-            var unitIndex = unitSelect.selectedIndex;
-            var unitValue = unitSelect.options[unitSelect.selectedIndex].value;
-            window.location = "AdminReport.aspx?unitId=" + unitIndex + "&unitV=" + unitValue;
+        
+        function SetUrl() {
+            var unit_index = GetSelectIndex("unit"); ;
+            var unit_value = GetSelectValue("unit");
+            var sub_index = GetSelectIndex("SubUnit");
+            var sub_value = GetSelectValue("SubUnit");
+            var team_index = GetSelectIndex("team");
+            var team_value = GetSelectValue("team");
+            url = "AdminReport.aspx?unitId=" + unit_index + "&unitV=" + unit_value + "&subId=" + sub_index + "&subV=" + sub_value
+                    + "&teamId=" + team_index + "&teamV=" + team_value;
+            window.location = url;
+        }
+        function GetSelectValue(id) {
+            try {
+                select = document.getElementById(id);
+                value = select.options[select.selectedIndex].value; 
+            }
+            catch (err) {
+                value = "0";
+            }
+            return value;
+        }
+        function GetSelectIndex(id) {
+            select = document.getElementById(id);
+            if (select.selectedIndex == "-1")
+                return "0";
+            return select.selectedIndex;
         }
         function SelectValues() {
             document.getElementById("unit").selectedIndex = QueryString["unitId"];
+            document.getElementById("SubUnit").selectedIndex = QueryString["subId"];
+            document.getElementById("team").selectedIndex = QueryString["teamId"];
+            unitValue = QueryString["unitV"];
+            subUnitValue = QueryString["subV"];
+            teamValue = QueryString["teamV"];
+            flag = false;
+            if (GetSelectValue("unit") != QueryString["unitV"]) {
+                unitValue = GetSelectValue("unit");
+                flag = true;
+            }
+            if (GetSelectValue("SubUnit") != QueryString["subV"]) {
+                subUnitValue = GetSelectValue("SubUnit");
+                flag = true;
+            }
+            if (GetSelectValue("team") != QueryString["teamV"]) {
+                teamValue = GetSelectValue("team");
+                flag = true;
+            }
+            url = "AdminReport.aspx?unitId=" + QueryString["unitId"] + "&unitV=" + unitValue + "&subId=" + QueryString["subId"] + "&subV=" + subUnitValue
+                    + "&teamId=" + QueryString["teamId"] + "&teamV=" + teamValue;
+            if(flag)
+                window.location = url;
         }
         var QueryString = function () {
             // This function is anonymous, is executed immediately and 
@@ -88,15 +131,18 @@
                                  </td>   
                             </tr>
                         <tr>
-                            <td>יחידה/ מחוז:</td><td><select name="unit" id="unit" onchange="GetSelectedValues()"><% PrintUnit(); %></select></td>
-                            <td>קבוצה:</td><td><select name="SubUnit" id="SubUnit"><% PrintSubUnit(); %></select></td>
-                            <td>צוות:</td><td><select name="team"><% PrintTeam(); %></select></td>
-                            <td>סטטוס דיווח:</td><td></td>
+                            <td>יחידה/ מחוז:</td><td><select name="unit" id="unit" onchange="SetUrl()"><% PrintUnit(); %></select></td>
+                            <td>קבוצה:</td><td><select name="SubUnit" id="SubUnit" onchange="SetUrl()"><% PrintSubUnit(); %></select></td>
+                            <td>צוות:</td><td><select name="team" id="team" onchange="SetUrl()"w><% PrintTeam(); %></select></td>
+                            <td>סטטוס דיווח:</td><td><select name="ReportStatus"><% PrintReportStatus(); %></select></td>
                         </tr>
                         <tr>
-                            <td>עובדים: </td><td><select></select></td>
-                            <td>חובת דיווח: </td><td><input type="checkbox" name="MustReport" /></td>
-                            <td>שם עובד: </td><td><input type="text" name="WorkerName" /></td>
+                            <td>תפקיד: </td><td><select name="hirarchy"><% PrintHirarchy(); %></select></td>
+                            <td>חובת דיווח: </td><td><input type="checkbox" name="MustReport" checked="checked" /></td>
+                            <td>שם עובד: </td><td><input type="text" name="WorkerName" list="AllWorkers"/>
+                                                    <datalist id="AllWorkers">
+                                                        <% PrintWorkers(); %>
+                                                    </datalist></td>
                             <td></td>
                             <td></td>
                         </tr>

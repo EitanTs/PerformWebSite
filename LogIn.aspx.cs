@@ -13,7 +13,7 @@ public partial class LogIn : System.Web.UI.Page
 {
     string TestUser = "u9999";
     string TestPassword = "123456";
-    string AdminUrl = "admin/AdminReport.aspx?unitId=0";
+    string AdminUrl = "admin/AdminReport.aspx?unitId=0&subId=0&teamId=0";
     string UserUrl = "User/UserHomePage.aspx?Search=1";
     DBConnector dbConn = new DBConnector();
     public void SaveSessionValues(DataTable dt)
@@ -69,7 +69,7 @@ public partial class LogIn : System.Web.UI.Page
         {
             var dt = GetUserDetails(TestUser, TestPassword);
             SaveSessionValues(dt);
-            Session["JobHierarchy"] = "31";
+            Session["Hierarchy"] = "31";
             Response.Redirect(AdminUrl);
         }
     }

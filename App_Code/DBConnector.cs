@@ -19,7 +19,17 @@ public class DBConnector : System.Web.UI.Page
     {
         return dbHelper.ExecuteDataTable(query, CommandType.Text);
     }
-
+    public DataTable ExecuteQuery(string query, DBParameter dbp)
+    {
+        try
+        {
+            return dbHelper.ExecuteDataTable(query, dbp, CommandType.Text);
+        }
+        catch (Exception e)
+        {
+            throw e;
+        }
+    }
     public DataTable ExecuteQuery(string query, DBParameterCollection dbp)
     {
         try
