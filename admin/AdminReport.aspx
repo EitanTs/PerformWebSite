@@ -7,7 +7,11 @@
     <title></title>
     <script type="text/javascript">
 
-        
+        function GetUrl() {
+            url = "AdminReport.aspx?unitId=" + unit_index + "&unitV=" + unit_value + "&subId=" + sub_index + "&subV=" + sub_value
+                    + "&teamId=" + team_index + "&teamV=" + team_value + "&search=" + "1"
+            return url;
+            }
         function SetUrl() {
             var unit_index = GetSelectIndex("unit"); ;
             var unit_value = GetSelectValue("unit");
@@ -16,7 +20,7 @@
             var team_index = GetSelectIndex("team");
             var team_value = GetSelectValue("team");
             url = "AdminReport.aspx?unitId=" + unit_index + "&unitV=" + unit_value + "&subId=" + sub_index + "&subV=" + sub_value
-                    + "&teamId=" + team_index + "&teamV=" + team_value;
+                    + "&teamId=" + team_index + "&teamV=" + team_value + "&search=" + QueryString["search"];
             window.location = url;
         }
         function GetSelectValue(id) {
@@ -36,7 +40,6 @@
             return select.selectedIndex;
         }
         function SelectValues() {
-            //document.getElementById("search").disabled = true;
             document.getElementById("unit").selectedIndex = QueryString["unitId"];
             document.getElementById("SubUnit").selectedIndex = QueryString["subId"];
             document.getElementById("team").selectedIndex = QueryString["teamId"];
@@ -56,8 +59,11 @@
                 teamValue = GetSelectValue("team");
                 flag = true;
             }
+
             url = "AdminReport.aspx?unitId=" + QueryString["unitId"] + "&unitV=" + unitValue + "&subId=" + QueryString["subId"] + "&subV=" + subUnitValue
                     + "&teamId=" + QueryString["teamId"] + "&teamV=" + teamValue;
+            if (QueryString["search"] != null)
+                url += "&search=" + QueryString["search"];
             if(flag)
                 window.location = url;
         }
@@ -107,6 +113,16 @@
 
         }
 </style>
+ <style type ="text/css">
+    .table td
+    {
+        text-align:center;
+    }
+    .table th
+    {
+        text-align:center;    
+    }
+  </style>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
     <link rel='stylesheet' href='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'/>
   <script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js'>
@@ -130,7 +146,7 @@
             מסך דיווח מנהל
         </div>
         <div class="panel-body" dir="rtl">
-            <form class="form-inline" action="" method="post">
+            <form class="form-inline" action="AdminReport.aspx?unitId=0&unitV=1&subId=0&subV=1&teamId=0&teamV=1&search=1" method="post">
                 <table class="table" dir="rtl">
                     <tbody>
                         <tr>
@@ -162,12 +178,12 @@
                         <tr>
                             <td>יחידה/ מחוז:</td><td><select name="unit" id="unit" onchange="SetUrl()"><% PrintUnit(); %></select></td>
                             <td>קבוצה:</td><td><select name="SubUnit" id="SubUnit" onchange="SetUrl()"><% PrintSubUnit(); %></select></td>
-                            <td>צוות:</td><td><select name="team" id="team" onchange="SetUrl()"w><% PrintTeam(); %></select></td>
+                            <td>צוות:</td><td><select name="team" id="team" onchange="SetUrl()"><% PrintTeam(); %></select></td>
                             <td>סטטוס דיווח:</td><td><select name="ReportStatus"><% PrintReportStatus(); %></select></td>
                         </tr>
                         <tr>
                             <td>תפקיד: </td><td><select name="hirarchy"><% PrintHirarchy(); %></select></td>
-                            <td>חובת דיווח: </td><td><input type="checkbox" name="MustReport" checked="checked" /></td>
+                            <td>חובת דיווח: </td><td><input type="checkbox" name="MustReport" id="MustReport" checked="checked" /></td>
                             <td>שם עובד: </td><td><input type="text" name="WorkerName" list="AllWorkers"/>
                                                     <datalist id="AllWorkers">
                                                         <% PrintWorkers(); %>
@@ -186,6 +202,16 @@
                 &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
                    <input type="submit" value="שמור" style="width:100px;"/>        
             </form>
+            <br />
+            <br />
+            <br />
+            <br />
+            <% 
+                if (Request.Form["month"] != null)
+                {
+                    CreateHtmlTable(GetMainTableValue(GetQuery()));
+                }
+                        %>
             </div>
                 </div>
             </div>

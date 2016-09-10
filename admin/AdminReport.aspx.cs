@@ -14,9 +14,9 @@ public partial class admin_AdminReport : System.Web.UI.Page
     PrintHtml printHtml = new PrintHtml();
     DBConnector dbConn = new DBConnector();
     Table table = new Table();
-    string url = "AdminReport.aspx?unitId={0}&unitV={1}&subId={2}&teamId={3}";
-    string SemiUrl = "AdminReport.aspx?unitId={0}&unitV={1}&subId={2}&subV={3}&teamId={4}";
-    string FullUrl = "AdminReport.aspx?unitId={0}&unitV={1}&subId={2}&subV={3}&teamId={4}&teamV={5}";
+    string url = "AdminReport.aspx?unitId={0}&unitV={1}&subId={2}&teamId={3}&search={4}";
+    string SemiUrl = "AdminReport.aspx?unitId={0}&unitV={1}&subId={2}&subV={3}&teamId={4}&search={5}";
+    string FullUrl = "AdminReport.aspx?unitId={0}&unitV={1}&subId={2}&subV={3}&teamId={4}&teamV={5}&search={6}";
     string OptionString = "<option value='{0}'>{1}</option>";
 
     public void PrintToolBar()
@@ -45,7 +45,7 @@ public partial class admin_AdminReport : System.Web.UI.Page
         var dt = dbConn.ExecuteQuery(AdminQueries.GetUnit, dbp);
         if (Request.QueryString["unitV"] == null)
         {
-            Response.Redirect(string.Format(url, Request.QueryString["unitId"], dt.Rows[0]["UnitIndx"],"0","0"));
+            Response.Redirect(string.Format(url, Request.QueryString["unitId"], dt.Rows[0]["UnitIndx"],"0","0", Request.QueryString["search"]));
         }
         PrintOptionValues(dt, "UnitIndx", "UnitName");
         
@@ -61,7 +61,7 @@ public partial class admin_AdminReport : System.Web.UI.Page
         var dt = dbConn.ExecuteQuery(AdminQueries.GetSubUnit, dbp);
         if (Request.QueryString["subV"] == null && dt.Rows.Count > 0)
         {
-            Response.Redirect(string.Format(SemiUrl, Request.QueryString["unitId"], Request.QueryString["unitV"], Request.QueryString["subId"], dt.Rows[0]["SubUnitIndx"],"0"));
+            Response.Redirect(string.Format(SemiUrl, Request.QueryString["unitId"], Request.QueryString["unitV"], Request.QueryString["subId"], dt.Rows[0]["SubUnitIndx"], "0", Request.QueryString["search"]));
         }
         PrintOptionValues(dt,"SubUnitIndx","SubUnitName");
     }
@@ -78,8 +78,8 @@ public partial class admin_AdminReport : System.Web.UI.Page
         var dt = dbConn.ExecuteQuery(AdminQueries.GetTeam, dbp);
         if (Request.QueryString["subV"] == null && dt.Rows.Count > 0)
         {
-            Response.Redirect(string.Format(FullUrl, Request.QueryString["unitId"], Request.QueryString["unitV"], 
-                Request.QueryString["subId"], dt.Rows[0]["SubUnitIndx"],Request.QueryString["teamId"], Request.QueryString["teamV"]));
+            Response.Redirect(string.Format(FullUrl, Request.QueryString["unitId"], Request.QueryString["unitV"],
+                Request.QueryString["subId"], dt.Rows[0]["SubUnitIndx"], Request.QueryString["teamId"], Request.QueryString["teamV"], Request.QueryString["search"]));
         }
         PrintOptionValues(dt, "CodeTeam", "CodeTeam");
     }
@@ -112,6 +112,68 @@ public partial class admin_AdminReport : System.Web.UI.Page
         {
             Response.Write(string.Format(OptionString, dr[firstCol].ToString(), dr[secondCol].ToString()));
         }
+    }
+
+    public string GetQuery()
+    {
+        return AdminQueries.TestGetMainTableWithPlan;
+        if (Request.Form["MustReport"] != null)
+            return AdminQueries.GetMainTableNoPlan;
+        return AdminQueries.GetMainTableWithPlan;
+    }
+    public DataTable GetMainTableValue(string query)
+    {
+        var dbp = new DBParameterCollection();
+        dbp.Add(new DBParameter("@UseMonth", Request.Form["month"]));
+        dbp.Add(new DBParameter("@UseYear", Request.Form["year"]));
+        dbp.Add(new DBParameter("@ReportStatus", Request.Form["ReportStatus"]));
+        dbp.Add(new DBParameter("@Hierarchy", Session["Hierarchy"]));
+        dbp.Add(new DBParameter("@JobHierarchy", DBNull.Value));
+        dbp.Add(new DBParameter("@JobIndx", Session["JobIndx"]));
+        dbp.Add(new DBParameter("@DepIndx", Session["DepIndx"]));
+        dbp.Add(new DBParameter("@UnitIndx", Request.Form["unit"]));
+        dbp.Add(new DBParameter("@SubUnitIndx", Request.Form["SubUnit"]));
+        dbp.Add(new DBParameter("@CodeTeam", Request.Form["team"]));
+        dbp.Add(new DBParameter("@UserIndx", dbConn.ExecuteQuery(AdminQueries.NameToIndex,new DBParameter("@FullName",Request.Form["WorkerName"])).Rows[0]["UserIndx"]));
+        var dt = dbConn.ExecuteQuery(query, dbp);
+        return dt;
+    }
+    public string[] SetHeadersArray()
+    {
+        var headers = new string[10];
+        headers[0] = "פירוט";
+        headers[1] = "בחר";
+        headers[2] = "שם עובד";
+        headers[3] = "תפקיד";
+        headers[4] = "תאריך סטטוס";
+        headers[5] = "סטטוס דיווח";
+        headers[6] = "ימי היעדרות";
+        headers[7] = "ביצוע/תכנון";
+        headers[8] = "הערת העובד";
+        headers[9] = "הערת המאשר";
+        return headers;
+    }
+    public void CreateHtmlTable(DataTable dt)
+    {
+        HtmlTable htmlTable = new HtmlTable();
+        var headers = SetHeadersArray();
+        htmlTable.AddHeader(headers);
+        foreach (DataRow dr in dt.Rows)
+        {
+            htmlTable.AddRow();
+            htmlTable.AddCell("<a href='#'><img src='../img/plus-icon.png' height='20' width='20'/></a>");
+            htmlTable.AddCell("<form><input type='checkbox' name='choose'>");
+            htmlTable.AddCell(string.Format("<a href='#'>{0}</a>",dr["FullName"].ToString()));
+            htmlTable.AddCell(dr["JobName"].ToString());
+            htmlTable.AddCell(DateTime.Today.ToString("MM/dd/yyyy"));
+            htmlTable.AddCell(dr["ReportStatus"].ToString());
+            htmlTable.AddCell(dr["DaysoffWork"].ToString());
+            htmlTable.AddCell(dr["PersentIncremental"].ToString());
+            htmlTable.AddCell(dr["RemarkUser"].ToString());
+            htmlTable.AddCell("<input type='text'/>");
+        }
+        htmlTable.close();
+        Response.Write(htmlTable.GetHtmlTable());
     }
     protected void Page_Load(object sender, EventArgs e)
     {
