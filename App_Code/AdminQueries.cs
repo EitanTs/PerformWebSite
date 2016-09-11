@@ -147,4 +147,6 @@ public class AdminQueries
     And IncrementalPlan > 0";
 
     public static string NameToIndex = @"SELECT * FROM MB_USERS WHERE FullName = @FullName";
+
+    public static string ReportStatusToName = @"SELECT * FROM MB_SupportDetails WHERE SupportIndx = 9 and SupportDtlNum = @SupportDtlNum";
 }

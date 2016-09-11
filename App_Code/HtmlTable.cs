@@ -54,6 +54,11 @@ public class HtmlTable
         string cell = string.Format("<td>{0}</td>", value);
         this.row += cell;
     }
+    public void AddCell(string attributeName, string attributeValue, string value)
+    {
+        string cell = string.Format("<td {0}='{1}'>{2}</td>", attributeName, attributeValue, value);
+        this.row += cell;
+    }
     public void close()
     {
         this.html += this.row;

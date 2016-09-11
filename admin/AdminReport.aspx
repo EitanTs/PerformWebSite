@@ -99,7 +99,40 @@
             }
             return query_string;
         } ();
-    
+        function ManipulateButtons() {
+        i = 1;
+            while (document.getElementById("choose" + i) != null) {
+            if (document.getElementById("choose" + i).checked == true) {
+                document.getElementById("approve").disabled = false;
+                document.getElementById("reject").disabled = false;
+                document.getElementById("reply").disabled = false;
+                document.getElementById("AddComment").disabled = false;
+                document.getElementById("DownloadExcel").disabled = false;
+
+                document.getElementById("approve").className = "button"
+                document.getElementById("reject").className = "button"
+                document.getElementById("reply").className = "button"
+                document.getElementById("AddComment").className = "button"
+                document.getElementById("DownloadExcel").className = "button"
+                return;
+                
+              }
+              i++;
+            }
+            
+                document.getElementById("approve").disabled = true;
+                document.getElementById("reject").disabled = true;
+                document.getElementById("reply").disabled = true;
+                document.getElementById("AddComment").disabled = true;
+                document.getElementById("DownloadExcel").disabled = true;
+                
+                document.getElementById("approve").className = "btn-disable"
+                document.getElementById("reject").className = "btn-disable"
+                document.getElementById("reply").className = "btn-disable"
+                document.getElementById("AddComment").className = "btn-disable"
+                document.getElementById("DownloadExcel").className = "btn-disable"
+            }
+        
     </script>
         <style type="text/css">
     .btn-disable
@@ -192,26 +225,35 @@
                             <td></td>
                         </tr>
                         <tr><td><br /></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                        <tr><td>תכנון/ ביצוע קטן מ-</td><td><input type="text" name="plan" id="plan" onchange="IsNumber()"/></td>
-                        <td><input type="submit" id="search" value="חפש" disabled='disabled' class='btn-disable'/>
+                        <tr><td>תכנון/ ביצוע קטן מ-</td><td><input type="text" name="plan" id="plan" value="100" onchange="IsNumber()"/></td>
+                        <td><input type="submit" id="search" value="חפש" />
                         </td><td></td><td></td><td></td><td></td><td></td></tr>
                         </tbody>
                     </table>
                <br />
                <br />
-                &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-                   <input type="submit" value="שמור" style="width:100px;"/>        
+                &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp       
             </form>
-            <br />
-            <br />
-            <br />
-            <br />
-            <% 
-                if (Request.Form["month"] != null)
-                {
-                    CreateHtmlTable(GetMainTableValue(GetQuery()));
-                }
-                        %>
+            <br /><br /><br /><br />
+            
+          
+                
+              <form class="form-inline" action="AdminReport.aspx?unitId=0&unitV=1&subId=0&subV=1&teamId=0&teamV=1&search=1" method="post">
+                <% 
+                    CreateHtmlHeader();
+                    if (Request.Form["month"] != null)
+                    {
+                        CreateHtmlTable(GetMainTableValue(GetQuery()));
+                    }
+                    PrintHtmlTable();
+                %>
+                <br /><br /><br /><br /><br />
+                <input type="submit" id="approve" name="approve" value="אשר דיווח" disabled="disabled" class="btn-disable" />
+                <input type="submit" id="reject" name="reject" value="דחה דיווח" disabled="disabled" class="btn-disable"/>
+                <input type="submit" id="reply" name="reply" value="החזר דיווח" disabled="disabled" class="btn-disable"/>
+                <input type="submit" id="AddComment" name="AddComment" value="הוסף/עדכן הערה" disabled="disabled" class="btn-disable"/>
+                <button disabled="disabled" id="DownloadExcel" class="btn-disable"><a href="../excel/AdminTable.csv" download="AdminTable.csv" >הפק דוח אקסל</a></button>
+              </form>
             </div>
                 </div>
             </div>

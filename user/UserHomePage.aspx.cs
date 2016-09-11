@@ -80,9 +80,8 @@ public partial class UserHomePage : System.Web.UI.Page
             updateUser = dt.Rows[0]["Update_User"].ToString();
             updateDate = DateTime.Parse(dt.Rows[0]["update_date"].ToString()).ToString("MM/dd/yyyy");
         }
-            ParseDtToXL(dt, ConfigurationManager.AppSettings["Path"],cols);
+        Excel.ParseDtToXL(dt, string.Format(ConfigurationManager.AppSettings["path"].ToString(), "MainTable.csv"),cols);
         var dict = table.GetColors();
-        //htmlTable += "<tbody>";
         var i = 0;
         bool flag = true;
         foreach (DataRow row in dt.Rows)
@@ -93,8 +92,6 @@ public partial class UserHomePage : System.Web.UI.Page
             else
                 htmlTable += "<tr>";
             flag = !flag;
-            //   htmlTable += string.Format("<tr class='{0}'>", dict[i % 3]);
-            //
             for (int j = 0; j < cols.Length; j++)
             {
                 if (cols[j] == "DoneMonth")
@@ -140,7 +137,7 @@ public partial class UserHomePage : System.Web.UI.Page
             <td><input type='submit' value='שמור' style='float:left;' name='save' {0}/></td>
             <td>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</td>
             <td><input type='submit' value='סיים דיווח' style='float:left;' name='EndReport' {0}/></td>
-            <td>&nbsp &nbsp <button><a href='/excel/MainTable.csv' download>הפק דוח אקסל</a></button></td>
+            <td>&nbsp &nbsp <button><a href='../excel/MainTable.csv' download>הפק דוח אקסל</a></button></td>
             <td>&nbsp &nbsp <button onclick='OpenAlert(""Update User: {1} \r\n Update Date: {2}"")'>הצג משתמש מעדכן</button></td>
             </tr>
             </table>
@@ -323,22 +320,6 @@ public partial class UserHomePage : System.Web.UI.Page
             dbp.RemoveAll();
         }
     }
-    /*public void UpdateMainReport()
-    {
-
-        for (int i = 0; i < int.Parse(Request.Form["Length"].ToString()); i++)
-        {
-            var dbp = new DBParameterCollection();
-            dbp.Add(new DBParameter("@DoneMonth", Request.Form[string.Format("DoneMonth{0}", i)]));
-            dbp.Add(new DBParameter("@PresentMonth", CalculateMonthPercent(i).ToString()));
-            dbp.Add(new DBParameter("@IncrementalDone", CalculateIncremental(i)));
-            dbp.Add(new DBParameter("@PresentIncremental", CalculateIncrementalPercent(i)));
-            dbp.Add(new DBParameter("@PrfMsrIndx", Session[string.Format("PrfMsrIndx{0}", i)]));
-            dbp.Add(new DBParameter("@Remark", Request.Form[string.Format("Remark{0}", i)]));
-            dbConn.ExecuteQuery(Queries.UpdateReport, dbp);
-            dbp.RemoveAll();
-        }
-    }*/
     public int CalculateMonthPercent(int i)
     {
         double done = double.Parse(Request.Form[string.Format("DoneMonth{0}", i)].ToString());
@@ -375,52 +356,7 @@ public partial class UserHomePage : System.Web.UI.Page
         if(Request.QueryString["Search"] != null)
             isPrint = true;
     }
-    public void PrintHeader(string header, StreamWriter sw)
-    {
-        sw.Write(header);
-        sw.Write(",");
-    }
-    public void ParseDtToXL(DataTable dt, string strFilePath, string[] cols)
-    {
-        /*<th>תיאור</th><th>סוג מדד</th><th>משקולות</th><th>תכנון חודשי</th><th>ביצוע חודשי</th><th>אחוז ביצוע/תכנון</th>
-                    <th>תכנון מצטבר</th><th>ביצוע מצטבר</th><th>אחוז ביצוע/תכנון</th><th>הערה</th><th>פירוט</th>*/
-        try
-        {
-            // Create the CSV file to which grid data will be exported.
-            StreamWriter sw = new StreamWriter(strFilePath, false, System.Text.Encoding.UTF8);
-            
-            // First we will write the headers.
-            //DataTable dt = m_dsProducts.Tables[0];
-            int iColCount = cols.Length;
-            PrintHeader("הערה", sw);
-            PrintHeader("אחוז ביצוע/תכנון", sw);
-            PrintHeader("ביצוע מצטבר", sw);
-            PrintHeader("תכנון מצטבר", sw);
-            PrintHeader("אחוז ביצוע/תכנון", sw);
-            PrintHeader("ביצוע חודשי", sw);
-            PrintHeader("תכנון חודשי", sw);
-            PrintHeader("משקולות", sw);
-            PrintHeader("סוג מדד", sw);
-            PrintHeader("תיאור", sw);          
-            sw.Write(sw.NewLine);
-            // Now write all the rows.
-            foreach (DataRow dr in dt.Rows)
-            {
-                for (int i = iColCount - 1; i >= 0 ; i--)
-                {
-                    sw.Write(dr[cols[i]].ToString());
-                    sw.Write(",");
-                }
-
-                sw.Write(sw.NewLine);
-            }
-            sw.Close();
-        }
-        catch (Exception e)
-        {
-            Response.Write(e.ToString());
-        }
-    }
+    
     public string GetJobName()
     {
         dbp.Add(new DBParameter("@SupportDTLNum", Session["JobType"]));

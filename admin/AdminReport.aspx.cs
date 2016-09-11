@@ -7,17 +7,18 @@ using System.Web.UI.WebControls;
 using DALC4NET;
 using System.Data;
 using System.Data.SqlClient;
-
+using System.Configuration;
 public partial class admin_AdminReport : System.Web.UI.Page
 {
     Select mySelect = new Select();
     PrintHtml printHtml = new PrintHtml();
     DBConnector dbConn = new DBConnector();
+    HtmlTable htmlTable = new HtmlTable();
     Table table = new Table();
     string url = "AdminReport.aspx?unitId={0}&unitV={1}&subId={2}&teamId={3}&search={4}";
     string SemiUrl = "AdminReport.aspx?unitId={0}&unitV={1}&subId={2}&subV={3}&teamId={4}&search={5}";
     string FullUrl = "AdminReport.aspx?unitId={0}&unitV={1}&subId={2}&subV={3}&teamId={4}&teamV={5}&search={6}";
-    string OptionString = "<option value='{0}'>{1}</option>";
+    string OptionString = "<option value='{0}' selected>{1}</option>"; //selected only for debug version
 
     public void PrintToolBar()
     {
@@ -113,13 +114,22 @@ public partial class admin_AdminReport : System.Web.UI.Page
             Response.Write(string.Format(OptionString, dr[firstCol].ToString(), dr[secondCol].ToString()));
         }
     }
-
     public string GetQuery()
     {
         return AdminQueries.TestGetMainTableWithPlan;
         if (Request.Form["MustReport"] != null)
             return AdminQueries.GetMainTableNoPlan;
         return AdminQueries.GetMainTableWithPlan;
+    }
+    public string ConvertReportStatus(string num)
+    {
+        var dbp = new DBParameter("@SupportDtlNum", num);
+        var dt = dbConn.ExecuteQuery(AdminQueries.ReportStatusToName, dbp);
+        if (dt.Rows.Count > 0)
+        {
+            return dt.Rows[0]["SupportDtlName"].ToString();
+        }
+        return "";
     }
     public DataTable GetMainTableValue(string query)
     {
@@ -153,27 +163,45 @@ public partial class admin_AdminReport : System.Web.UI.Page
         headers[9] = "הערת המאשר";
         return headers;
     }
-    public void CreateHtmlTable(DataTable dt)
+    public string GetJobType()
     {
-        HtmlTable htmlTable = new HtmlTable();
+        if (Session["JobType"].ToString() == "1")
+            return "תפקיד ראשי";
+        return "תפקד משני";
+    }
+
+    public void CreateHtmlHeader()
+    {
         var headers = SetHeadersArray();
         htmlTable.AddHeader(headers);
+    }
+    public void CreateHtmlTable(DataTable dt)
+    {
+        var i = 1;
         foreach (DataRow dr in dt.Rows)
         {
+            var remarkUser = dr["RemarkUser"].ToString();
+            if (remarkUser.ToString().Length < 2)
+                remarkUser = "אין";
             htmlTable.AddRow();
             htmlTable.AddCell("<a href='#'><img src='../img/plus-icon.png' height='20' width='20'/></a>");
-            htmlTable.AddCell("<form><input type='checkbox' name='choose'>");
+            htmlTable.AddCell(string.Format("<form><input type='checkbox' id='choose{0}' name='choose{0}' onclick='ManipulateButtons()'>", i));
             htmlTable.AddCell(string.Format("<a href='#'>{0}</a>",dr["FullName"].ToString()));
-            htmlTable.AddCell(dr["JobName"].ToString());
+            htmlTable.AddCell("title", GetJobType(),dr["JobName"].ToString());
             htmlTable.AddCell(DateTime.Today.ToString("MM/dd/yyyy"));
-            htmlTable.AddCell(dr["ReportStatus"].ToString());
+            htmlTable.AddCell(ConvertReportStatus(dr["ReportStatus"].ToString()));
             htmlTable.AddCell(dr["DaysoffWork"].ToString());
             htmlTable.AddCell(dr["PersentIncremental"].ToString());
-            htmlTable.AddCell(dr["RemarkUser"].ToString());
+            htmlTable.AddCell(remarkUser);
             htmlTable.AddCell("<input type='text'/>");
+            i++;
         }
+        Excel.AdminParseDtToXL(dt, string.Format(ConfigurationManager.AppSettings["path"].ToString(), "AdminTable.csv"));
+    }
+    public void PrintHtmlTable()
+    {
         htmlTable.close();
-        Response.Write(htmlTable.GetHtmlTable());
+        Response.Write(htmlTable.GetHtmlTable()); 
     }
     protected void Page_Load(object sender, EventArgs e)
     {
