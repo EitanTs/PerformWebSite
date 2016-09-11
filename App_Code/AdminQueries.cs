@@ -149,4 +149,23 @@ public class AdminQueries
     public static string NameToIndex = @"SELECT * FROM MB_USERS WHERE FullName = @FullName";
 
     public static string ReportStatusToName = @"SELECT * FROM MB_SupportDetails WHERE SupportIndx = 9 and SupportDtlNum = @SupportDtlNum";
+
+    public static string ReportExtension = @"SELECT U.PrfMsrIndx ,U.UserJbGrpIndx, U.MeasureIndx,U.MeasureType,M.MeasureName ,U.Score,U.UseMonth,
+	                                       U.PlanYear,U.PlanMonth,U.DoneMonth,U.PresentMonth,U.IncrementalDone,
+                                           U.IncrementalPlan,U.PresentIncremental,U.Remark,U.Update_User,U.Update_date
+	                                        From       MB_UserJbPrfMsr U
+	                                        INNER JOIN MB_Measures     M
+	                                               ON  U.MeasureIndx= M.MeasureIndx 
+	                                        WHERE U.UserJbGrpIndx in(Select UserJbGrpIndx 
+	                                                                 From MB_UserJobGroup JG
+						                                             INNER JOIN MB_UserJob US
+	                                                                  ON  US.JobUserIndx= JG.JobUserIndx
+						                                             Where JobIndx=@JobIndx
+							                                         And   JobType =@JobType 
+						                                             And   UserIndx=@UserIndx
+	                                                                 And   UseYear = @UseYear
+						                                             And   US.Status =1
+						                                             And   JG.Status =1) 
+	                                        And U.UseMonth =@UseMonth
+	                                        And U.status =1";
 }

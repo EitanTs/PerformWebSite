@@ -10,6 +10,7 @@ using System.Data.SqlClient;
 using System.Configuration;
 public partial class admin_AdminReport : System.Web.UI.Page
 {
+    string UserIndx = "";
     Select mySelect = new Select();
     PrintHtml printHtml = new PrintHtml();
     DBConnector dbConn = new DBConnector();
@@ -144,8 +145,13 @@ public partial class admin_AdminReport : System.Web.UI.Page
         dbp.Add(new DBParameter("@UnitIndx", Request.Form["unit"]));
         dbp.Add(new DBParameter("@SubUnitIndx", Request.Form["SubUnit"]));
         dbp.Add(new DBParameter("@CodeTeam", Request.Form["team"]));
-        dbp.Add(new DBParameter("@UserIndx", dbConn.ExecuteQuery(AdminQueries.NameToIndex,new DBParameter("@FullName",Request.Form["WorkerName"])).Rows[0]["UserIndx"]));
-        var dt = dbConn.ExecuteQuery(query, dbp);
+        var dt = dbConn.ExecuteQuery(AdminQueries.NameToIndex,new DBParameter("@FullName",Request.Form["WorkerName"]));
+        if (dt.Rows.Count > 0)
+        {
+            UserIndx = dt.Rows[0]["UserIndx"].ToString();
+        }
+        dbp.Add(new DBParameter("@UserIndx", UserIndx));
+        dt = dbConn.ExecuteQuery(query, dbp);
         return dt;
     }
     public string[] SetHeadersArray()
@@ -175,6 +181,50 @@ public partial class admin_AdminReport : System.Web.UI.Page
         var headers = SetHeadersArray();
         htmlTable.AddHeader(headers);
     }
+    public string GetExtension()
+    {
+        var headers = new string[12];
+        headers[0] = "תיאור";
+        headers[1] = "סוג מדד";
+        headers[2] = "משקולות";
+        headers[3] = "תכנון שנתי";
+        headers[4] = "תכנון חודשי";
+        headers[5] = "ביצוע חודשי";
+        headers[6] = "אחוז/ביצוע תכנון";
+        headers[7] = "תכנון מצטבר";
+        headers[8] = "ביצוע מצטבר";
+        headers[9] = "אחוז/ביצוע מצטבר";
+        headers[10] = "הערות";
+        headers[11] = "פירוט";
+        HtmlTable extentionTable = new HtmlTable();
+        extentionTable.AddHeader(headers);
+        var dbp = new DBParameterCollection();
+        dbp.Add(new DBParameter("@JobIndx", Session["JobIndx"]));
+        dbp.Add(new DBParameter("@JobType", Session["JobType"]));
+        dbp.Add(new DBParameter("@UseYear", Request.Form["year"]));
+        dbp.Add(new DBParameter("@UseMonth", Request.Form["month"]));
+        dbp.Add(new DBParameter("@UserIndx", UserIndx));
+        var dt = dbConn.ExecuteQuery(AdminQueries.ReportExtension, dbp);
+        foreach (DataRow dr in dt.Rows)
+        {
+            extentionTable.AddRow();
+            extentionTable.AddCell(dr["MeasureName"].ToString());
+            extentionTable.AddCell(dr["MeasureType"].ToString());
+            extentionTable.AddCell(dr["Score"].ToString());
+            extentionTable.AddCell(dr["PlanYear"].ToString());
+            extentionTable.AddCell(dr["PlanMonth"].ToString());
+            extentionTable.AddCell(dr["DoneMonth"].ToString());
+            extentionTable.AddCell(dr["PresentMonth"].ToString());
+            extentionTable.AddCell(dr["IncrementalPlan"].ToString());
+            extentionTable.AddCell(dr["IncrementalDone"].ToString());
+            extentionTable.AddCell(dr["PresentIncremental"].ToString());
+            extentionTable.AddCell(dr["Remark"].ToString());
+            extentionTable.AddCell("bgcolor", "#0052cc",
+                string.Format("<a href=../../user/SpecifyPerforms.aspx?Indx={0} style='color:#F0FFFF';>פירוט</a></td>", dr["MeasureIndx"]));
+        }
+        extentionTable.close();
+        return extentionTable.GetHtmlTable();
+    }
     public void CreateHtmlTable(DataTable dt)
     {
         var i = 1;
@@ -184,7 +234,8 @@ public partial class admin_AdminReport : System.Web.UI.Page
             if (remarkUser.ToString().Length < 2)
                 remarkUser = "אין";
             htmlTable.AddRow();
-            htmlTable.AddCell("<a href='#'><img src='../img/plus-icon.png' height='20' width='20'/></a>");
+            htmlTable.AddCell(string.Format(@"<a href='#'><img src='../img/plus-icon.png' height='20' width='20' onclick='OpenWindow(""Extensions/ExtensionTable{0}.html"")'/>", i));
+            FileHandler.WriteContent(string.Format(ConfigurationManager.AppSettings["ExtensionPath"].ToString(), i), GetExtension());
             htmlTable.AddCell(string.Format("<form><input type='checkbox' id='choose{0}' name='choose{0}' onclick='ManipulateButtons()'>", i));
             htmlTable.AddCell(string.Format("<a href='#'>{0}</a>",dr["FullName"].ToString()));
             htmlTable.AddCell("title", GetJobType(),dr["JobName"].ToString());
@@ -201,7 +252,7 @@ public partial class admin_AdminReport : System.Web.UI.Page
     public void PrintHtmlTable()
     {
         htmlTable.close();
-        Response.Write(htmlTable.GetHtmlTable()); 
+        Response.Write(htmlTable.GetHtmlTable());
     }
     protected void Page_Load(object sender, EventArgs e)
     {

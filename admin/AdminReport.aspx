@@ -132,7 +132,9 @@
                 document.getElementById("AddComment").className = "btn-disable"
                 document.getElementById("DownloadExcel").className = "btn-disable"
             }
-        
+            function OpenWindow(href) {
+                window.open(href, "", "height=300,width=800,left=300,top=300");
+            }
     </script>
         <style type="text/css">
     .btn-disable
@@ -145,6 +147,7 @@
         background-color: #ffffff;
 
         }
+   
 </style>
  <style type ="text/css">
     .table td

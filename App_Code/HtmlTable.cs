@@ -8,12 +8,11 @@ using System.Web;
 /// </summary>
 public class HtmlTable
 {
-    string head = @"<head runat='server'>
-    <title></title>
-  <link rel='stylesheet' href='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'>
-  <script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js'></script>
+    string head = @"<head> <link rel='stylesheet' href='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'/>
+  <script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js'>
+  </script>
   <script type='text/javascript' src='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js'></script>
-  <style>
+  <style type ='text/css'>
     .table td
     {
         text-align:center;
@@ -22,13 +21,13 @@ public class HtmlTable
     {
         text-align:center;    
     }
-  </style>
-</head><table class='table'>";
+  </style></head><table class='table' dir='rtl'>";
+    string id = "";
     string html = "";
     string row = "";
-	public HtmlTable()
+	public HtmlTable(bool enable=true, string id="table")
 	{
-        this.html = head;
+        this.html = this.head;
 	}
    public void AddHeader(string[] headers)
     {
