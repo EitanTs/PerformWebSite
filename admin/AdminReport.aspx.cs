@@ -20,7 +20,8 @@ public partial class admin_AdminReport : System.Web.UI.Page
     string SemiUrl = "AdminReport.aspx?unitId={0}&unitV={1}&subId={2}&subV={3}&teamId={4}&search={5}";
     string FullUrl = "AdminReport.aspx?unitId={0}&unitV={1}&subId={2}&subV={3}&teamId={4}&teamV={5}&search={6}";
     string OptionString = "<option value='{0}' selected>{1}</option>"; //selected only for debug version
-
+    string formattedIndexes = "(";
+    string OpenWindow = "<script>window.open('RemarkManager.aspx', '', 'height=200,width=800,left=300,top=300');</script>";
     public void PrintToolBar()
     {
         Response.Write(printHtml.GetFrame("AdminToolBar.html"));
@@ -236,7 +237,7 @@ public partial class admin_AdminReport : System.Web.UI.Page
             htmlTable.AddRow();
             htmlTable.AddCell(string.Format(@"<a href='#'><img src='../img/plus-icon.png' height='20' width='20' onclick='OpenWindow(""Extensions/ExtensionTable{0}.html"")'/>", i));
             FileHandler.WriteContent(string.Format(ConfigurationManager.AppSettings["ExtensionPath"].ToString(), i), GetExtension());
-            htmlTable.AddCell(string.Format("<form><input type='checkbox' id='choose{0}' name='choose{0}' onclick='ManipulateButtons()'>", i));
+            htmlTable.AddCell(string.Format("<input type='checkbox' id='choose{0}' name='choose{0}' onclick='ManipulateButtons()'>", i));
             htmlTable.AddCell(string.Format("<a href='#'>{0}</a>",dr["FullName"].ToString()));
             htmlTable.AddCell("title", GetJobType(),dr["JobName"].ToString());
             htmlTable.AddCell(DateTime.Today.ToString("MM/dd/yyyy"));
@@ -244,18 +245,74 @@ public partial class admin_AdminReport : System.Web.UI.Page
             htmlTable.AddCell(dr["DaysoffWork"].ToString());
             htmlTable.AddCell(dr["PersentIncremental"].ToString());
             htmlTable.AddCell(remarkUser);
-            htmlTable.AddCell("<input type='text'/>");
+            htmlTable.AddCell(string.Format("<input type='text' name='RemarkManager'/><input type='hidden' name='PrfIndex{0}' value='{1}'", i, dr["PrfGrpIndx"].ToString()));
             i++;
         }
-        Excel.AdminParseDtToXL(dt, string.Format(ConfigurationManager.AppSettings["path"].ToString(), "AdminTable.csv"));
+    
     }
     public void PrintHtmlTable()
     {
         htmlTable.close();
         Response.Write(htmlTable.GetHtmlTable());
     }
+    public void GetChosenLines()
+    {
+        var i = 1;
+        var chooseId = string.Format("choose{0}", i);
+
+        var indexId = string.Format("PrfIndex{0}", i);
+        while (Request.Form[indexId] != null)
+        {
+            if (Request.Form[chooseId] == "on")
+            {
+                formattedIndexes += string.Format("{0},", Request.Form[indexId]);
+            }
+            i++;
+            chooseId = string.Format("choose{0}", i);
+            indexId = string.Format("PrfIndex{0}", i);
+        }
+        if (formattedIndexes.Length > 1)
+        {
+            formattedIndexes = formattedIndexes.Remove(formattedIndexes.Length - 1);
+        }
+        formattedIndexes += ")";
+        Session["ChosenLines"] = formattedIndexes;
+    }
+    public void UpdateReportStatus(int reportStatus)
+    {
+        GetChosenLines();
+        var dbp = new DBParameterCollection();
+        dbp.Add(new DBParameter("@ReportStatus", reportStatus));
+        dbp.Add(new DBParameter("@RemarkManager",Request.Form["RemarkManager"]));
+        dbp.Add(new DBParameter("@Update_User", Session["UserID"]));
+        dbConn.ExecuteQuery(string.Format(AdminQueries.ApproveReportStatus, formattedIndexes), dbp);
+    }
+    public void DownloadExcel()
+    {
+        GetChosenLines();
+        var dt = dbConn.ExecuteQuery(string.Format(AdminQueries.ExcelMainTableValue, formattedIndexes));
+        Excel.AdminParseDtToXL(dt, string.Format(ConfigurationManager.AppSettings["path"].ToString(), "AdminTable.csv"));
+        Response.Write("<iframe width='1' height='1' frameborder='0' src='../excel/AdminTable.csv'></iframe>");
+    }
     protected void Page_Load(object sender, EventArgs e)
     {
         PrintToolBar();
+        if (Request.Form["approve"] != null)
+        {
+            UpdateReportStatus(4);
+        }
+        if (Request.Form["reply"] != null)
+        {
+            UpdateReportStatus(3);
+        }
+        if (Request.Form["excel"] != null)
+        {
+            DownloadExcel();
+        }
+        if (Request.Form["approve"] != null || Request.Form["AddComment"] != null)
+        {
+            GetChosenLines();
+            Response.Write(OpenWindow);
+        }
     }
 }

@@ -255,7 +255,7 @@
                 <input type="submit" id="reject" name="reject" value="דחה דיווח" disabled="disabled" class="btn-disable"/>
                 <input type="submit" id="reply" name="reply" value="החזר דיווח" disabled="disabled" class="btn-disable"/>
                 <input type="submit" id="AddComment" name="AddComment" value="הוסף/עדכן הערה" disabled="disabled" class="btn-disable"/>
-                <button disabled="disabled" id="DownloadExcel" class="btn-disable"><a href="../excel/AdminTable.csv" download="AdminTable.csv" >הפק דוח אקסל</a></button>
+                <input type="submit" id="DownloadExcel" name='excel' class="btn-disable" value="הפק דוח אקסל" />
               </form>
             </div>
                 </div>

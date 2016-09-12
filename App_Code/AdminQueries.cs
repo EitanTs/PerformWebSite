@@ -116,6 +116,25 @@ public class AdminQueries
 	And   (US.EndJob is null or US.EndJob>Getdate()-60)
     And IncrementalPlan > 0";
 
+    public static string ExcelMainTableValue =@"SELECT U.FullName,J.JobName,G.PrfGrpIndx,G.UseMonth G_UseYear,G.PersentPlnYear,G.PersentIncremental,
+	G.ReportStatus,G.RemarkManager,G.RemarkUser,G.DaysOffWork,G.SickDays
+	From        MB_UserJbPrfGrp G
+	 INNER JOIN MB_UserJobGroup JG
+	       ON   G.UserJbGrpIndx= JG.UserJbGrpIndx
+	 INNER JOIN MB_UserJob US
+	       ON   US.JobUserIndx= JG.JobUserIndx
+     INNER JOIN MB_Users U
+	       ON   US.UserIndx= U.UserIndx
+     INNER JOIN MB_Jobs J
+	       ON   US.JobUserIndx= J.JobIndx
+	WHERE US.Status =1
+    And   JG.Status =1
+	And    G.status =1
+	And    j.Status =1
+	And    U.Status =1
+	And   (US.EndJob is null or US.EndJob>Getdate()-60)
+    And PrfGrpIndx in {0}";
+
     public static string TestGetMainTableWithPlan = @"SELECT U.FullName,J.JobName,G.PrfGrpIndx,G.UseMonth G_UseYear,G.PersentPlnYear,G.PersentIncremental,
 	G.ReportStatus,G.RemarkManager,G.RemarkUser,G.DaysOffWork,G.SickDays
 	From        MB_UserJbPrfGrp G
@@ -168,4 +187,11 @@ public class AdminQueries
 						                                             And   JG.Status =1) 
 	                                        And U.UseMonth =@UseMonth
 	                                        And U.status =1";
+
+    public static string ApproveReportStatus = @" Update MB_UserJbPrfGrp
+                                                 Set    ReportStatus  = @ReportStatus,
+                                                        RemarkManager = @RemarkManager,
+                                                        Update_User   = @Update_User ,   
+                                                        Update_date   = GETDATE()
+                                                 Where  PrfGrpIndx in {0} ";
 }
