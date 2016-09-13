@@ -16,14 +16,14 @@ public partial class admin_AdminReport : System.Web.UI.Page
     DBConnector dbConn = new DBConnector();
     HtmlTable htmlTable = new HtmlTable();
     Table table = new Table();
-    string url = "AdminReport.aspx?unitId={0}&unitV={1}&subId={2}&teamId={3}&search={4}";
-    string SemiUrl = "AdminReport.aspx?unitId={0}&unitV={1}&subId={2}&subV={3}&teamId={4}&search={5}";
-    string FullUrl = "AdminReport.aspx?unitId={0}&unitV={1}&subId={2}&subV={3}&teamId={4}&teamV={5}&search={6}";
-    string OptionString = "<option value='{0}' selected>{1}</option>"; //selected only for debug version
+    string SelectedOptionString = "<option value='{0}' selected>{1}</option>"; //selected only for debug version
+    string OptionString = "<option value='{0}'>{1}</option>"; 
     string formattedIndexes = "(";
     string OpenWindow = "<script>window.open('RemarkManager.aspx?1=1', '', 'height=200,width=800,left=300,top=300');</script>";
     string OpenRejectWindow = "<script>window.open('RemarkManager.aspx?1=1&status=3', '', 'height=200,width=800,left=300,top=300');</script>";
-    bool IsChanged = false;
+    string UnitIndex = "0";
+    string SubUnitIndex = "0";
+    string TeamIndex = "0";
 
 
     public void PrintToolBar()
@@ -43,6 +43,7 @@ public partial class admin_AdminReport : System.Web.UI.Page
     }
     public void PrintUnit()
     {
+        UnitIndex = Request.QueryString["unitV"].ToString();
         DBParameterCollection dbp = new DBParameterCollection();
         if (int.Parse(Session["Hierarchy"].ToString()) > 4)
             dbp.Add(new DBParameter("@UnitIndx", DBNull.Value));
@@ -50,45 +51,49 @@ public partial class admin_AdminReport : System.Web.UI.Page
             dbp.Add(new DBParameter("@UnitIndx", Session["UnitIndx"]));
         dbp.Add(new DBParameter("@DepIndx", Session["DepIndx"].ToString()));
         var dt = dbConn.ExecuteQuery(AdminQueries.GetUnit, dbp);
-        if (Request.QueryString["unitV"] == null)
-        {
-            Response.Redirect(string.Format(url, Request.QueryString["unitId"], dt.Rows[0]["UnitIndx"],"0","0", Request.QueryString["search"]));
-        }
-        PrintOptionValues(dt, "UnitIndx", "UnitName");
-        
+        if(UnitIndex != "0")
+            PrintOptionValues(dt, "UnitIndx", "UnitName", UnitIndex);
+        else
+            PrintOptionValues(dt, "UnitIndx", "UnitName");
+        if (dt.Rows.Count > 0 && Request.QueryString["c1"] == null)
+            UnitIndex = dt.Rows[0]["UnitIndx"].ToString();
     }
     public void PrintSubUnit()
     {
+        if (Request.QueryString["subV"] != null)
+            SubUnitIndex = Request.QueryString["subV"].ToString();
         DBParameterCollection dbp = new DBParameterCollection();
         if (int.Parse(Session["Hierarchy"].ToString()) > 30)
             dbp.Add(new DBParameter("@SubUnitIndx", DBNull.Value));
         else
             dbp.Add(new DBParameter("@SubUnitIndx", Session["SubUnitIndx"]));
-        dbp.Add(new DBParameter("@UnitIndx", Request.QueryString["unitV"]));
+        dbp.Add(new DBParameter("@UnitIndx", UnitIndex));
         var dt = dbConn.ExecuteQuery(AdminQueries.GetSubUnit, dbp);
-        if (Request.QueryString["subV"] == null && dt.Rows.Count > 0)
-        {
-            Response.Redirect(string.Format(SemiUrl, Request.QueryString["unitId"], Request.QueryString["unitV"], Request.QueryString["subId"], dt.Rows[0]["SubUnitIndx"], "0", Request.QueryString["search"]));
-        }
-        PrintOptionValues(dt,"SubUnitIndx","SubUnitName");
+        if(dt.Rows.Count > 0 && Request.QueryString["c2"] == null && Request.QueryString["c3"] == null)
+            SubUnitIndex = dt.Rows[0]["SubUnitIndx"].ToString();
+        if (SubUnitIndex != "0")
+            PrintOptionValues(dt, "SubUnitIndx", "SubUnitName", SubUnitIndex);
+        else
+            PrintOptionValues(dt,"SubUnitIndx","SubUnitName");
+        //Page.Response.Redirect(Page.Request.Url.ToString(), true);
     }
     public void PrintTeam()
     {
-        if (Request.QueryString["subV"] == null)
-            return;
+        if (Request.QueryString["teamV"] != null)
+            TeamIndex = Request.QueryString["teamV"].ToString();
         DBParameterCollection dbp = new DBParameterCollection();
         if (int.Parse(Session["Hierarchy"].ToString()) > 20)
             dbp.Add(new DBParameter("@CodeTeam", DBNull.Value));
         else
             dbp.Add(new DBParameter("@CodeTeam", Session["SubUnitIndx"]));
-        dbp.Add(new DBParameter("@SubUnitIndx", Request.QueryString["subV"]));
-        var dt = dbConn.ExecuteQuery(AdminQueries.GetTeam, dbp);
-        if (Request.QueryString["subV"] == null && dt.Rows.Count > 0)
-        {
-            Response.Redirect(string.Format(FullUrl, Request.QueryString["unitId"], Request.QueryString["unitV"],
-                Request.QueryString["subId"], dt.Rows[0]["SubUnitIndx"], Request.QueryString["teamId"], Request.QueryString["teamV"], Request.QueryString["search"]));
-        }
-        PrintOptionValues(dt, "CodeTeam", "CodeTeam");
+        dbp.Add(new DBParameter("@SubUnitIndx", SubUnitIndex));
+            var dt = dbConn.ExecuteQuery(AdminQueries.GetTeam, dbp);
+        if(dt.Rows.Count > 0 && (Request.QueryString["c3"] != null || Request.QueryString["teamV"] == "0"))
+            TeamIndex = dt.Rows[0]["CodeTeam"].ToString();
+        if(TeamIndex != "0")
+            PrintOptionValues(dt, "CodeTeam", "CodeTeam",TeamIndex);
+        else
+            PrintOptionValues(dt, "CodeTeam", "CodeTeam");
     }
     public void PrintReportStatus()
     {
@@ -104,20 +109,53 @@ public partial class admin_AdminReport : System.Web.UI.Page
         var dbp = new DBParameterCollection();
         dbp.Add(new DBParameter("@CompanyIndx", Session["CompanyIndx"]));
         dbp.Add(new DBParameter("@DepIndx", Session["DepIndx"]));
-        dbp.Add(new DBParameter("@UnitIndx", Request.QueryString["unitV"]));
-        dbp.Add(new DBParameter("@SubUnitIndx", Request.QueryString["subV"]));
-        if (Request.QueryString["teamV"] == null)
-            dbp.Add(new DBParameter("@CodeTeam", DBNull.Value));
-        else
-            dbp.Add(new DBParameter("@CodeTeam", Request.QueryString["teamV"]));
+
+        dbp.Add(new DBParameter("@UnitIndx", UnitIndex));
+        dbp.Add(new DBParameter("@SubUnitIndx", SubUnitIndex));
+        dbp.Add(new DBParameter("@CodeTeam", TeamIndex));
+
         dbp.Add(new DBParameter("@UserIndx", DBNull.Value));
         PrintOptionValues(dbConn.ExecuteQuery(AdminQueries.GetWorkers, dbp), "UserIndx", "FullName");
     }
-    public void PrintOptionValues(DataTable dt, string firstCol, string secondCol)
+    public void PrintOptionValues(DataTable dt, string firstCol, string secondCol, string selected)
     {
+        var i = 0;
         foreach (DataRow dr in dt.Rows)
         {
-            Response.Write(string.Format(OptionString, dr[firstCol].ToString(), dr[secondCol].ToString()));
+            if (dr[firstCol].ToString() == selected)
+            {
+                Response.Write(string.Format(SelectedOptionString, dr[firstCol].ToString(), dr[secondCol].ToString()));
+            }
+            else
+            {
+                if (i == 0)
+                {
+                    Response.Write(string.Format(SelectedOptionString, dr[firstCol].ToString(), dr[secondCol].ToString()));
+                }
+
+                else
+                {
+                    Response.Write(string.Format(OptionString, dr[firstCol].ToString(), dr[secondCol].ToString()));
+                }
+            }
+            i++;
+        }
+    }
+    public void PrintOptionValues(DataTable dt, string firstCol, string secondCol)
+    {
+        var i = 0;
+        foreach (DataRow dr in dt.Rows)
+        {
+                if (i == 0)
+                {
+                    Response.Write(string.Format(SelectedOptionString, dr[firstCol].ToString(), dr[secondCol].ToString()));
+                }
+
+                else
+                {
+                    Response.Write(string.Format(OptionString, dr[firstCol].ToString(), dr[secondCol].ToString()));
+                }
+                i += 1;
         }
     }
     public string GetQuery()
@@ -301,7 +339,7 @@ public partial class admin_AdminReport : System.Web.UI.Page
     }
     protected void Page_Load(object sender, EventArgs e)
     {
-        PrintToolBar();
+        PrintToolBar();           
         if (Request.Form["approve"] != null)
         {
             UpdateReportStatus(4);

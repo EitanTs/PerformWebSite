@@ -10,6 +10,18 @@
             select = document.getElementById(id);
             return select.options[select.selectedIndex] == null
         }
+        function SetUrlTest() {
+            $.ajax({
+                type: "POST",
+                data: $("#SearchForm").serialize(),
+                url: "AdminReport.aspx",
+                success: function () {
+                    window.location.reload();
+                }
+            });
+        };
+
+      
         function GetUrl() {
             url = "AdminReport.aspx?unitId=" + unit_index + "&unitV=" + unit_value + "&subId=" + sub_index + "&subV=" + sub_value
                     + "&teamId=" + team_index + "&teamV=" + team_value + "&search=" + "1"
@@ -27,23 +39,23 @@
                     + "&teamId=" + team_index + "&teamV=" + team_value + "&search=" + QueryString["search"];
             window.location = url;
         }
-        function SetUnitUrl() {
+        function SetUrlUnit() {
             var unit_index = GetSelectIndex("unit"); ;
             var unit_value = GetSelectValue("unit");
             url = "AdminReport.aspx?unitId=" + unit_index + "&unitV=" + unit_value + "&subId=" + 0 + "&subV=" + 0
-                    + "&teamId=" + 0 + "&teamV=" + 0 + "&search=" + QueryString["search"] + "&change=1";
+                    + "&teamId=" + 0 + "&teamV=" + 0 + "&search=" + QueryString["search"] + "&c1=1";
             window.location = url;
         }
-        function SetSubUnitUrl() {
+        function SetUrlSubUnit() {
             var unit_index = GetSelectIndex("unit"); ;
             var unit_value = GetSelectValue("unit");
             var sub_index = GetSelectIndex("SubUnit");
             var sub_value = GetSelectValue("SubUnit");
             url = "AdminReport.aspx?unitId=" + unit_index + "&unitV=" + unit_value + "&subId=" + sub_index + "&subV=" + sub_value
-                    + "&teamId=" + 0 + "&teamV=" + 0 + "&search=" + QueryString["search"] + "&change=2";
+                    + "&teamId=" + 0 + "&teamV=" + 0 + "&search=" + QueryString["search"] + "&c2=1";
             window.location = url;
         }
-        function SetTeamUrl() {
+        function SetUrlTeam() {
             var unit_index = GetSelectIndex("unit"); ;
             var unit_value = GetSelectValue("unit");
             var sub_index = GetSelectIndex("SubUnit");
@@ -51,7 +63,7 @@
             var team_index = GetSelectIndex("team");
             var team_value = GetSelectValue("team");
             url = "AdminReport.aspx?unitId=" + unit_index + "&unitV=" + unit_value + "&subId=" + sub_index + "&subV=" + sub_value
-                    + "&teamId=" + team_index + "&teamV=" + team_value + "&search=" + QueryString["search"] + "&change=3";
+                    + "&teamId=" + team_index + "&teamV=" + team_value + "&search=" + QueryString["search"] + "&c3=1";
             window.location = url;
         }
         function GetSelectValue(id) {
@@ -95,8 +107,8 @@
                     + "&teamId=" + QueryString["teamId"] + "&teamV=" + teamValue;
             if (QueryString["search"] != null)
                 url += "&search=" + QueryString["search"];
-            if(flag)
-                window.location.href = url;
+            //if(flag)
+              //  window.location.href = url;
         }
         function IsNumber() {
             if (document.getElementById("plan").value > -1) {
@@ -197,7 +209,8 @@
   <script type='text/javascript' src='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js'></script>
   
 </head>
-<body onload="SelectValues()">
+<body>
+    
     <br />
     <br />
     <br />
@@ -213,7 +226,7 @@
             מסך דיווח מנהל
         </div>
         <div class="panel-body" dir="rtl">
-            <form class="form-inline" action="AdminReport.aspx?unitId=0&unitV=1&subId=0&subV=1&teamId=0&teamV=1&search=1" method="post">
+            <form class="form-inline" action="AdminReport.aspx?unitId=0&unitV=1&subId=0&subV=1&teamId=0&teamV=1&search=1" method="post" id="SearchForm">
                 <table class="table" dir="rtl">
                     <tbody>
                         <tr>
@@ -243,9 +256,9 @@
                                  </td>   
                             </tr>
                         <tr>
-                            <td>יחידה/ מחוז:</td><td><select name="unit" id="unit" onchange="SetUnitUrl()"><% PrintUnit(); %></select></td>
-                            <td>קבוצה:</td><td><select name="SubUnit" id="SubUnit" onchange="SetSubUnitUrl()"><% PrintSubUnit(); %></select></td>
-                            <td>צוות:</td><td><select name="team" id="team" onchange="SetTeamUrl()"><% PrintTeam(); %></select></td>
+                            <td>יחידה/ מחוז:</td><td><select name="unit" id="unit" onchange="SetUrlUnit()"><% PrintUnit(); %></select></td>
+                            <td>קבוצה:</td><td><select name="SubUnit" id="SubUnit" onchange="SetUrlSubUnit()"><% PrintSubUnit(); %></select></td>
+                            <td>צוות:</td><td><select name="team" id="team" onchange="SetUrlTeam()"><% PrintTeam(); %></select></td>
                             <td>סטטוס דיווח:</td><td><select name="ReportStatus"><% PrintReportStatus(); %></select></td>
                         </tr>
                         <tr>

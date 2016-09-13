@@ -21,7 +21,7 @@ public class AdminQueries
                                     AND DepIndx =  @DepIndx
                                     AND UnitIndx = ISNULL(@UnitIndx,UnitIndx)";
     
-    public static string GetSubUnit = @"SELECT SubUnitIndx,SubUnitName
+    public static string GetSubUnit = @"SELECT distinct SubUnitIndx,SubUnitName
 	                                    From MB_SubUnits
 	                                    WHERE  Status =1
 	                                    AND UnitIndx =  @UnitIndx
