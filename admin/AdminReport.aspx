@@ -6,13 +6,17 @@
 <head runat="server">
     <title></title>
     <script type="text/javascript">
-
+        function IsOptionNull(id) {
+            select = document.getElementById(id);
+            return select.options[select.selectedIndex] == null
+        }
         function GetUrl() {
             url = "AdminReport.aspx?unitId=" + unit_index + "&unitV=" + unit_value + "&subId=" + sub_index + "&subV=" + sub_value
                     + "&teamId=" + team_index + "&teamV=" + team_value + "&search=" + "1"
             return url;
             }
-        function SetUrl() {
+            function SetUrl() {
+                
             var unit_index = GetSelectIndex("unit"); ;
             var unit_value = GetSelectValue("unit");
             var sub_index = GetSelectIndex("SubUnit");
@@ -21,6 +25,33 @@
             var team_value = GetSelectValue("team");
             url = "AdminReport.aspx?unitId=" + unit_index + "&unitV=" + unit_value + "&subId=" + sub_index + "&subV=" + sub_value
                     + "&teamId=" + team_index + "&teamV=" + team_value + "&search=" + QueryString["search"];
+            window.location = url;
+        }
+        function SetUnitUrl() {
+            var unit_index = GetSelectIndex("unit"); ;
+            var unit_value = GetSelectValue("unit");
+            url = "AdminReport.aspx?unitId=" + unit_index + "&unitV=" + unit_value + "&subId=" + 0 + "&subV=" + 0
+                    + "&teamId=" + 0 + "&teamV=" + 0 + "&search=" + QueryString["search"] + "&change=1";
+            window.location = url;
+        }
+        function SetSubUnitUrl() {
+            var unit_index = GetSelectIndex("unit"); ;
+            var unit_value = GetSelectValue("unit");
+            var sub_index = GetSelectIndex("SubUnit");
+            var sub_value = GetSelectValue("SubUnit");
+            url = "AdminReport.aspx?unitId=" + unit_index + "&unitV=" + unit_value + "&subId=" + sub_index + "&subV=" + sub_value
+                    + "&teamId=" + 0 + "&teamV=" + 0 + "&search=" + QueryString["search"] + "&change=2";
+            window.location = url;
+        }
+        function SetTeamUrl() {
+            var unit_index = GetSelectIndex("unit"); ;
+            var unit_value = GetSelectValue("unit");
+            var sub_index = GetSelectIndex("SubUnit");
+            var sub_value = GetSelectValue("SubUnit");
+            var team_index = GetSelectIndex("team");
+            var team_value = GetSelectValue("team");
+            url = "AdminReport.aspx?unitId=" + unit_index + "&unitV=" + unit_value + "&subId=" + sub_index + "&subV=" + sub_value
+                    + "&teamId=" + team_index + "&teamV=" + team_value + "&search=" + QueryString["search"] + "&change=3";
             window.location = url;
         }
         function GetSelectValue(id) {
@@ -65,7 +96,7 @@
             if (QueryString["search"] != null)
                 url += "&search=" + QueryString["search"];
             if(flag)
-                window.location = url;
+                window.location.href = url;
         }
         function IsNumber() {
             if (document.getElementById("plan").value > -1) {
@@ -212,9 +243,9 @@
                                  </td>   
                             </tr>
                         <tr>
-                            <td>יחידה/ מחוז:</td><td><select name="unit" id="unit" onchange="SetUrl()"><% PrintUnit(); %></select></td>
-                            <td>קבוצה:</td><td><select name="SubUnit" id="SubUnit" onchange="SetUrl()"><% PrintSubUnit(); %></select></td>
-                            <td>צוות:</td><td><select name="team" id="team" onchange="SetUrl()"><% PrintTeam(); %></select></td>
+                            <td>יחידה/ מחוז:</td><td><select name="unit" id="unit" onchange="SetUnitUrl()"><% PrintUnit(); %></select></td>
+                            <td>קבוצה:</td><td><select name="SubUnit" id="SubUnit" onchange="SetSubUnitUrl()"><% PrintSubUnit(); %></select></td>
+                            <td>צוות:</td><td><select name="team" id="team" onchange="SetTeamUrl()"><% PrintTeam(); %></select></td>
                             <td>סטטוס דיווח:</td><td><select name="ReportStatus"><% PrintReportStatus(); %></select></td>
                         </tr>
                         <tr>

@@ -21,7 +21,11 @@ public partial class admin_AdminReport : System.Web.UI.Page
     string FullUrl = "AdminReport.aspx?unitId={0}&unitV={1}&subId={2}&subV={3}&teamId={4}&teamV={5}&search={6}";
     string OptionString = "<option value='{0}' selected>{1}</option>"; //selected only for debug version
     string formattedIndexes = "(";
-    string OpenWindow = "<script>window.open('RemarkManager.aspx', '', 'height=200,width=800,left=300,top=300');</script>";
+    string OpenWindow = "<script>window.open('RemarkManager.aspx?1=1', '', 'height=200,width=800,left=300,top=300');</script>";
+    string OpenRejectWindow = "<script>window.open('RemarkManager.aspx?1=1&status=3', '', 'height=200,width=800,left=300,top=300');</script>";
+    bool IsChanged = false;
+
+
     public void PrintToolBar()
     {
         Response.Write(printHtml.GetFrame("AdminToolBar.html"));
@@ -245,7 +249,8 @@ public partial class admin_AdminReport : System.Web.UI.Page
             htmlTable.AddCell(dr["DaysoffWork"].ToString());
             htmlTable.AddCell(dr["PersentIncremental"].ToString());
             htmlTable.AddCell(remarkUser);
-            htmlTable.AddCell(string.Format("<input type='text' name='RemarkManager'/><input type='hidden' name='PrfIndex{0}' value='{1}'", i, dr["PrfGrpIndx"].ToString()));
+            htmlTable.AddCell(string.Format("<input type='text' name='RemarkManager' value='{2}'/><input type='hidden' name='PrfIndex{0}' value='{1}'", 
+                i, dr["PrfGrpIndx"].ToString(), dr["RemarkManager"].ToString()));
             i++;
         }
     
@@ -309,7 +314,12 @@ public partial class admin_AdminReport : System.Web.UI.Page
         {
             DownloadExcel();
         }
-        if (Request.Form["approve"] != null || Request.Form["AddComment"] != null)
+        if (Request.Form["reject"] != null)
+        {
+            GetChosenLines();
+            Response.Write(OpenRejectWindow);
+        }
+        if (Request.Form["AddComment"] != null)
         {
             GetChosenLines();
             Response.Write(OpenWindow);

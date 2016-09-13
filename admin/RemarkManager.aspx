@@ -7,8 +7,8 @@
     <title></title>
     <script type="text/javascript">
         function Approval() {
-            if (confirm('Format the hard disk?'))
-                window.location = "RemarkManager.aspx?del=1";
+            if (confirm('Delete all messages?'))
+                window.location = window.location.href + "&del=1";
 
         }
         function ValidateRemark() {
@@ -19,7 +19,7 @@
             else {
                 document.getElementById("save").disabled = true;
                 document.getElementById("save").className = "btn-disable";
-            } 
+            }
         }
     </script>
      <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
@@ -51,7 +51,7 @@
     
     <table class="table" dir="rtl">
         <tr >
-            <td><form action="RemarkManager.aspx?id=1" method="post">הערה:</td> <td> <input type="text" id="remark" size="50" onchange="ValidateRemark()" id="remark"/></td><td></td><td></td>
+            <td><form action="" method="post">הערה:</td> <td> <input type="text" id="remark" size="50" onchange="ValidateRemark()" name="remark"/></td><td></td><td></td>
         </tr> 
         <tr><td></td><td></td><td></td> <td><br /></td></tr>
         <tr style="background-color:#e0e0d1">

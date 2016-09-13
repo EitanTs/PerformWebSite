@@ -194,4 +194,17 @@ public class AdminQueries
                                                         Update_User   = @Update_User ,   
                                                         Update_date   = GETDATE()
                                                  Where  PrfGrpIndx in {0} ";
+
+    public static string RejectReport = @" Update MB_UserJbPrfGrp
+ Set    ReportStatus  = @ReportStatus,
+        RemarkManager = @RemarkManager,
+        Update_User   = @Update_User ,   
+        Update_date   = GETDATE()
+        Where  PrfGrpIndx in {0}";
+
+    public static string UpdateRemarkManager = @" Update MB_UserJbPrfGrp
+ Set    RemarkManager = @RemarkManager,
+        Update_User   = @Update_User ,   
+        Update_date   = GETDATE()
+        Where  PrfGrpIndx in {0}";
 }
