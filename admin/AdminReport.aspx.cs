@@ -75,7 +75,6 @@ public partial class admin_AdminReport : System.Web.UI.Page
             PrintOptionValues(dt, "SubUnitIndx", "SubUnitName", SubUnitIndex);
         else
             PrintOptionValues(dt,"SubUnitIndx","SubUnitName");
-        //Page.Response.Redirect(Page.Request.Url.ToString(), true);
     }
     public void PrintTeam()
     {
