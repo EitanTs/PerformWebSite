@@ -160,7 +160,7 @@ public partial class admin_AdminReport : System.Web.UI.Page
     public string GetQuery()
     {
         return AdminQueries.TestGetMainTableWithPlan;
-        if (Request.Form["MustReport"] != null)
+        if(Request.Form["MustReport"] != null)
             return AdminQueries.GetMainTableNoPlan;
         return AdminQueries.GetMainTableWithPlan;
     }
@@ -173,6 +173,32 @@ public partial class admin_AdminReport : System.Web.UI.Page
             return dt.Rows[0]["SupportDtlName"].ToString();
         }
         return "";
+    }
+    public void SetSessionsToSearch()
+    { 
+        Session["month"] = Request.Form["month"];
+        Session["year"] = Request.Form["year"];
+        Session["ReportStatus"] = Request.Form["ReportStatus"];
+        Session["unit"] = Request.Form["unit"];
+        Session["SubUnit"] = Request.Form["SubUnit"];
+        Session["team"] = Request.Form["team"];
+    }
+    public DataTable GetSessionsTableValue(string query)
+    {
+        var dbp = new DBParameterCollection();
+        dbp.Add(new DBParameter("@UseMonth", Session["month"]));
+        dbp.Add(new DBParameter("@UseYear", Session["year"]));
+        dbp.Add(new DBParameter("@ReportStatus",Session["ReportStatus"]));
+        dbp.Add(new DBParameter("@Hierarchy", Session["Hierarchy"]));
+        dbp.Add(new DBParameter("@JobHierarchy", DBNull.Value));
+        dbp.Add(new DBParameter("@JobIndx", Session["JobIndx"]));
+        dbp.Add(new DBParameter("@DepIndx", Session["DepIndx"]));
+        dbp.Add(new DBParameter("@UnitIndx", Session["unit"]));
+        dbp.Add(new DBParameter("@SubUnitIndx", Session["SubUnit"]));
+        dbp.Add(new DBParameter("@CodeTeam", Session["team"]));
+        dbp.Add(new DBParameter("@UserIndx", Session["SearchUserIndx"]));
+        var dt = dbConn.ExecuteQuery(query, dbp);
+        return dt;
     }
     public DataTable GetMainTableValue(string query)
     {
@@ -187,12 +213,14 @@ public partial class admin_AdminReport : System.Web.UI.Page
         dbp.Add(new DBParameter("@UnitIndx", Request.Form["unit"]));
         dbp.Add(new DBParameter("@SubUnitIndx", Request.Form["SubUnit"]));
         dbp.Add(new DBParameter("@CodeTeam", Request.Form["team"]));
+        SetSessionsToSearch();
         var dt = dbConn.ExecuteQuery(AdminQueries.NameToIndex,new DBParameter("@FullName",Request.Form["WorkerName"]));
         if (dt.Rows.Count > 0)
         {
             UserIndx = dt.Rows[0]["UserIndx"].ToString();
         }
         dbp.Add(new DBParameter("@UserIndx", UserIndx));
+        Session["SearchUserIndx"] = UserIndx;
         dt = dbConn.ExecuteQuery(query, dbp);
         return dt;
     }
@@ -243,9 +271,9 @@ public partial class admin_AdminReport : System.Web.UI.Page
         var dbp = new DBParameterCollection();
         dbp.Add(new DBParameter("@JobIndx", Session["JobIndx"]));
         dbp.Add(new DBParameter("@JobType", Session["JobType"]));
-        dbp.Add(new DBParameter("@UseYear", Request.Form["year"]));
-        dbp.Add(new DBParameter("@UseMonth", Request.Form["month"]));
-        dbp.Add(new DBParameter("@UserIndx", UserIndx));
+        dbp.Add(new DBParameter("@UseYear", Session["year"]));
+        dbp.Add(new DBParameter("@UseMonth", Session["month"]));
+        dbp.Add(new DBParameter("@UserIndx", Session["SearchUserIndx"]));
         var dt = dbConn.ExecuteQuery(AdminQueries.ReportExtension, dbp);
         foreach (DataRow dr in dt.Rows)
         {
@@ -336,9 +364,15 @@ public partial class admin_AdminReport : System.Web.UI.Page
         Excel.AdminParseDtToXL(dt, string.Format(ConfigurationManager.AppSettings["path"].ToString(), "AdminTable.csv"));
         Response.Write("<iframe width='1' height='1' frameborder='0' src='../excel/AdminTable.csv'></iframe>");
     }
+    public void AutoSearch()
+    {
+        CreateHtmlTable(GetSessionsTableValue(GetQuery()));
+    }
     protected void Page_Load(object sender, EventArgs e)
     {
-        PrintToolBar();           
+        PrintToolBar(); 
+        if(!(new IsLogOn().IsLogedOn()))
+            Response.Redirect(@"..\LogIn.aspx");
         if (Request.Form["approve"] != null)
         {
             UpdateReportStatus(4);

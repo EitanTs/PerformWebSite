@@ -110,6 +110,8 @@ public partial class user_UpdateProfile : System.Web.UI.Page
     }
     protected void Page_Load(object sender, EventArgs e)
     {
+        if (!(new IsLogOn().IsLogedOn()))
+            Response.Redirect(@"..\LogIn.aspx");
         if (Request.Form["percent"] != null)
             InsertUpdateDB();
         if (Request.QueryString["id"] != null)

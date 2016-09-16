@@ -13,7 +13,7 @@ public class DBConnector : System.Web.UI.Page
 	{
        
 	}
-  
+    
 
     public DataTable ExecuteQuery(string query)
     {
@@ -40,6 +40,8 @@ public class DBConnector : System.Web.UI.Page
         {
             throw e;
         }
+        		
+
     }
 
     public DataTable ExecuteProcedure(string query)

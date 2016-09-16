@@ -28,7 +28,6 @@ public partial class UserHomePage : System.Web.UI.Page
     {
         Response.Write(printHtml.GetFrame("UserToolBar.html"));
     }
-
     public void InsertValuesToParameters()
     {
         
@@ -48,7 +47,6 @@ public partial class UserHomePage : System.Web.UI.Page
             dbp.Add(new DBParameter("@UseYear", year));
         }
     }
-
     public void PrintMainTable()
     {
         var updateUser = "";
@@ -137,6 +135,8 @@ public partial class UserHomePage : System.Web.UI.Page
             <td><input type='submit' value='שמור' style='float:left;' name='save' {0}/></td>
             <td>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</td>
             <td><input type='submit' value='סיים דיווח' style='float:left;' name='EndReport' {0}/></td>
+            <td>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</td>
+            <td><input type='submit' value='בטל דיווח' style='float:left;' name='CancelReport' /></td>
             <td>&nbsp &nbsp <button><a href='../excel/MainTable.csv' download>הפק דוח אקסל</a></button></td>
             <td>&nbsp &nbsp <button onclick='OpenAlert(""Update User: {1} \r\n Update Date: {2}"")'>הצג משתמש מעדכן</button></td>
             </tr>
@@ -174,7 +174,6 @@ public partial class UserHomePage : System.Web.UI.Page
         }
         return string.Format("<td bgcolor='#0052cc'><a href=SpecifyPerforms.aspx?Indx={0} style='color:#F0FFFF';>פירוט</a></td>", measureIndx);
     }
-
     public void PrintSecondTable()
     {
         var htmlTable= "";
@@ -206,11 +205,16 @@ public partial class UserHomePage : System.Web.UI.Page
         var dbParam = new DBParameterCollection();
         if (dt.Rows.Count == 0)
         {
-            a.Add("G_Update_date", "");
-            a.Add("PersentIncremental", "");
+            a.Add("RemarkManager", "");
+            a.Add("RemarkUser", "");
+            a.Add("DaysOffWorkYear", "");
+            a.Add("SickDaysYear", "");
+            a.Add("DaysOffWork", "");
+            a.Add("SickDays", "");
             a.Add("PersentPlnYear", "");
             a.Add("ReportStatus", "");
-            a.Add("RemarkManager", "");
+            a.Add("PersentIncremental", "");
+            a.Add("G_Update_date", "");
             a.Add("ReportStatusName", "");
             return;
         }
@@ -281,10 +285,11 @@ public partial class UserHomePage : System.Web.UI.Page
         dbConn.ExecuteQuery(Queries.UpdateSecondReport, UpdateDbp);
 
     }
-    public void UpdateEndReport()
+    public void UpdateEndReport(int reportStatus)
     {
         var UpdateDbp = new DBParameterCollection();
         UpdateDbp.Add(new DBParameter("@UserJbGrpIndx", Session["UserJbGrpIndx"].ToString()));
+        UpdateDbp.Add(new DBParameter("@UpdateReportStatus", reportStatus));
         if (Session["Month"] != null)
         {
             UpdateDbp.Add(new DBParameter("@UseMonth", Session["Month"])); 
@@ -303,7 +308,6 @@ public partial class UserHomePage : System.Web.UI.Page
         int daysOld = int.Parse(Session[type].ToString());
         return daysYear + daysNew - daysOld;
     }
-
     public void UpdateMainReport()
     {
         
@@ -347,7 +351,11 @@ public partial class UserHomePage : System.Web.UI.Page
             UpdateMainReport();
             if (Request.Form["EndReport"] != null)
             {
-                UpdateEndReport();
+                UpdateEndReport(2);
+            }
+            if (Request.Form["CancelReport"] != null)
+            {
+                UpdateEndReport(1);
             }
         }
     }
@@ -356,7 +364,6 @@ public partial class UserHomePage : System.Web.UI.Page
         if(Request.QueryString["Search"] != null)
             isPrint = true;
     }
-    
     public string GetJobName()
     {
         dbp.Add(new DBParameter("@SupportDTLNum", Session["JobType"]));
@@ -369,8 +376,11 @@ public partial class UserHomePage : System.Web.UI.Page
         
         return lastUser;
     }
+
     protected void Page_Load(object sender, EventArgs e)
     {
+        if (!(new IsLogOn().IsLogedOn()))
+            Response.Redirect(@"..\LogIn.aspx");
         AutoSearch();
         UpdateAllReports();
         isPrint = InsertFormValues();

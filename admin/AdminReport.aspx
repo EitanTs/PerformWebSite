@@ -226,7 +226,7 @@
             מסך דיווח מנהל
         </div>
         <div class="panel-body" dir="rtl">
-            <form class="form-inline" action="AdminReport.aspx?unitId=0&unitV=1&subId=0&subV=1&teamId=0&teamV=1&search=1" method="post" id="SearchForm">
+            <form class="form-inline" action="AdminReport.aspx?unitId=0&unitV=1&subId=0&subV=1&teamId=0&teamV=1" method="post" id="SearchForm">
                 <table class="table" dir="rtl">
                     <tbody>
                         <tr>
@@ -291,6 +291,10 @@
                     if (Request.Form["month"] != null)
                     {
                         CreateHtmlTable(GetMainTableValue(GetQuery()));
+                    }
+                    if (Request.QueryString["search"] != null)
+                    {
+                        AutoSearch();
                     }
                     PrintHtmlTable();
                 %>

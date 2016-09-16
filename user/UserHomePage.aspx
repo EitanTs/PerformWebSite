@@ -100,7 +100,15 @@
                 <table class="table" dir="rtl" style="color:black";>
                     <thead>
                         <tr>
-                            <th> תאריך: </th>  <th><% Response.Write(DateTime.Parse(GetValuesDictionary()["G_Update_date"]).ToString("MM/dd/yyyy")); %></th>
+                            <th> תאריך: </th>  <th><% try
+                                                      {
+                                                          Response.Write(DateTime.Parse(GetValuesDictionary()["G_Update_date"]).ToString("MM/dd/yyyy"));
+                                                      }
+                                                      catch
+                                                      {
+                                                          Response.Write(GetValuesDictionary()["G_Update_date"]);
+                                                      }
+                                                           %></th>
                              <th> סטטוס דיווח: </th>  <th><% Response.Write(GetValuesDictionary()["ReportStatusName"]); %></th>
                              <th> אחוז ביצוע שנתי: </th>  <th><% Response.Write(GetValuesDictionary()["PersentPlnYear"]); %></th>
                              <th> אחוז ביצוע לעומת תכנון: </th>  <th><% Response.Write(GetValuesDictionary()["PersentIncremental"]); %></th>  

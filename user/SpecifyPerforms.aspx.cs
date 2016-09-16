@@ -114,6 +114,8 @@ public partial class user_SpecifyPerforms : System.Web.UI.Page
     }
     protected void Page_Load(object sender, EventArgs e)
     {
+        if(!(new IsLogOn().IsLogedOn()))
+            Response.Redirect(@"..\LogIn.aspx");
         Session["SpecifyIndx"] = Request.QueryString["Indx"].ToString();
         if (Request.QueryString["DelId"] != null)
             DeleteEvent();

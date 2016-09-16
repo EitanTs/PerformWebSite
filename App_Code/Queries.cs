@@ -152,7 +152,7 @@
  public static string UpdateEndReport = @"
          Update MB_UserJbPrfGrp
  set    
-        ReportStatus=2
+        ReportStatus=@UpdateReportStatus
  WHERE  UserJbGrpIndx = @UserJbGrpIndx
  AND    UseMonth=@UseMonth";
 

@@ -207,4 +207,5 @@ public class AdminQueries
         Update_User   = @Update_User ,   
         Update_date   = GETDATE()
         Where  PrfGrpIndx in {0}";
+    
 }
