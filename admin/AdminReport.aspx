@@ -264,14 +264,14 @@
                         <tr>
                             <td>תפקיד: </td><td><select name="hirarchy"><% PrintHirarchy(); %></select></td>
                             <td>חובת דיווח: </td><td><input type="checkbox" name="MustReport" id="MustReport" checked="checked" /></td>
-                            <td>שם עובד: </td><td><input type="text" name="WorkerName" list="AllWorkers"/>
+                            <td>**שם עובד: </td><td><input type="text" name="WorkerName" list="AllWorkers"/>
                                                     <datalist id="AllWorkers">
                                                         <% PrintWorkers(); %>
                                                     </datalist></td>
                             <td></td>
                             <td></td>
                         </tr>
-                        <tr><td><br /></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        <tr><td>** שדה זה הינו חובה</td><td><br /></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
                         <tr><td>תכנון/ ביצוע קטן מ-</td><td><input type="text" name="plan" id="plan" value="100" onchange="IsNumber()"/></td>
                         <td><input type="submit" id="search" value="חפש" />
                         </td><td></td><td></td><td></td><td></td><td></td></tr>
@@ -292,7 +292,7 @@
                     {
                         CreateHtmlTable(GetMainTableValue(GetQuery()));
                     }
-                    if (Request.QueryString["search"] != null)
+                    if (Request.QueryString["search"] == "1")
                     {
                         AutoSearch();
                     }

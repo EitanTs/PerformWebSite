@@ -175,13 +175,13 @@ public partial class admin_AdminReport : System.Web.UI.Page
         return "";
     }
     public void SetSessionsToSearch()
-    { 
-        Session["month"] = Request.Form["month"];
-        Session["year"] = Request.Form["year"];
-        Session["ReportStatus"] = Request.Form["ReportStatus"];
-        Session["unit"] = Request.Form["unit"];
-        Session["SubUnit"] = Request.Form["SubUnit"];
-        Session["team"] = Request.Form["team"];
+    {
+            Session["month"] = Request.Form["month"];
+            Session["year"] = Request.Form["year"];
+            Session["ReportStatus"] = Request.Form["ReportStatus"];
+            Session["unit"] = Request.Form["unit"];
+            Session["SubUnit"] = Request.Form["SubUnit"];
+            Session["team"] = Request.Form["team"];
     }
     public DataTable GetSessionsTableValue(string query)
     {
